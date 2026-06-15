@@ -115,8 +115,8 @@ class TestHierarchicalMarco:
         flat_mcses = [frozenset(ss) for kind, ss in flat_subsets if kind == "MCS"]
 
         hier_subsets = list(hierarchical_marco(root, initial_level=2))
-        hier_musses = [frozenset(c) for kind, c, _ in hier_subsets if kind == "MUS"]
-        hier_mcses = [frozenset(c) for kind, c, _ in hier_subsets if kind == "MCS"]
+        hier_musses = [frozenset(c) for kind, c, _, _ in hier_subsets if kind == "MUS"]
+        hier_mcses = [frozenset(c) for kind, c, _, _ in hier_subsets if kind == "MCS"]
 
         assert set(hier_musses) == set(flat_musses)
         assert set(hier_mcses) == set(flat_mcses)
@@ -129,7 +129,7 @@ class TestHierarchicalMarco:
         hier_subsets = list(hierarchical_marco(root, initial_level=1))
 
         all_names = set()
-        for _, _, names in hier_subsets:
+        for _, _, names, _ in hier_subsets:
             all_names.update(names)
 
         # refinement should reach individual row/col leaves, not just the two top groups

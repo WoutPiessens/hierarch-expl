@@ -90,9 +90,12 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
         get reinterpreted in terms of the (now activated) children, without rebuilding either
         solver.
 
-        Yields `(kind, constraints, names)` tuples, where `kind` is `"MUS"` or `"MCS"`,
+        Yields `(kind, constraints, names, round)` tuples, where `kind` is `"MUS"` or `"MCS"`,
         `constraints` is the list of grouped constraints (one `cp.all(...)` per involved node),
-        and `names` is the list of `ConstraintNode.get_full_name()` for those nodes.
+        `names` is the list of `ConstraintNode.get_full_name()` for those nodes, and `round`
+        is the 1-indexed refinement round in which this MUS/MCS was found (incremented every
+        time the current set of groups gets refined, mirroring the per-round structure of
+        re-running flat `marco` on each successive refinement of `groups`).
 
         :param: root: root :class:`ConstraintNode` of the constraint hierarchy
         :param: hard: hard constraints, optional, list of expressions
@@ -143,8 +146,10 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
     do_solution_hint = do_solution_hint and hasattr(map_solver_inst, "solution_hint")
     seen = set()
     partitioned = set()  # ids of nodes refined so far; their "p" var is asserted from then on
+    round_idx = 0
 
     while groups:
+        round_idx += 1
         assump = [ind[id(node)] for node in groups]
         deletion_order = {a: -len(get_variables(dmap[a].get_grouped_constraint())) for a in assump}
 
@@ -198,7 +203,8 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                 key = (kind, frozenset(id(node) for node in found_nodes))
                 if key not in seen:
                     seen.add(key)
-                    yield kind, [node.get_grouped_constraint() for node in found_nodes], [node.get_full_name() for node in found_nodes]
+                    yield (kind, [node.get_grouped_constraint() for node in found_nodes],
+                           [node.get_full_name() for node in found_nodes], round_idx)
 
         refined = False
         new_groups = []
