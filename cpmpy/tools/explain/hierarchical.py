@@ -84,6 +84,44 @@ class ConstraintNode:
             node = node.parent
         return " ".join(reversed(parts))
 
+    def level(self):
+        """Depth of this node below the root (root is level 0, its children level 1, ...)."""
+        lvl = 0
+        node = self.parent
+        while node is not None:
+            lvl += 1
+            node = node.parent
+        return lvl
+
+
+def activate_descendants_at_level(node, target_level):
+    """
+        Refine `node` to `target_level`, mirroring the "scripted" refinement of the
+        defense-rostering experiments: descend from `node` until reaching nodes at depth
+        ``>= target_level`` (or a leaf reached earlier) — those become **active** groups —
+        while every strictly-intermediate node becomes **partitioned** (a pass-through used
+        only for map-solver bookkeeping). This can *skip* intermediate levels (e.g. a
+        single-child "renaming" level), unlike one-level-at-a-time refinement.
+
+        Only children that carry constraints (``get_grouped_constraint() is not None``) are
+        considered.
+
+        :return: ``(active, partitioned)``, two lists of :class:`ConstraintNode`.
+    """
+    active, partitioned = [], []
+
+    def recurse(n):
+        children = [c for c in n.children if c.get_grouped_constraint() is not None]
+        if n.level() >= target_level or not children:
+            active.append(n)
+        else:
+            partitioned.append(n)
+            for c in children:
+                recurse(c)
+
+    recurse(node)
+    return active, partitioned
+
 
 def constraint_node_to_dict(root, index_of):
     """
