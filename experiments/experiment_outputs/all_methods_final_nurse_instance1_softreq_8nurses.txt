@@ -62,3 +62,25 @@ RESULT staged-deletion 53 4 repaired q=1 c=0 r=0 b=0 mcs=1 mus=0 relax=5 t=1s mi
 RESULT staged-deletion 73 4 repaired q=8 c=0 r=0 b=0 mcs=8 mus=0 relax=7 t=1s min=5 excess=2
 RESULT staged-deletion 82 4 repaired q=11 c=0 r=0 b=0 mcs=11 mus=1 relax=8 t=1s min=7 excess=1
 RESULT staged-deletion 95 4 repaired q=2 c=0 r=0 b=0 mcs=2 mus=0 relax=5 t=1s min=5 excess=0
+
+== explore-highest-after-fail ==
+RESULT explore-highest-after-fail 48 1 repaired q=28 c=8 r=15 b=5 mcs=1931 mus=1224 relax=6 t=34s
+RESULT explore-highest-after-fail 53 1 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT explore-highest-after-fail 73 1 repaired q=29 c=7 r=16 b=6 mcs=1221 mus=785 relax=5 t=15s
+RESULT explore-highest-after-fail 82 1 repaired q=32 c=8 r=17 b=7 mcs=2835 mus=1899 relax=7 t=55s
+RESULT explore-highest-after-fail 95 1 TIMEOUT
+RESULT explore-highest-after-fail 48 2 repaired q=72 c=17 r=41 b=14 mcs=2229 mus=1649 relax=6 t=54s
+RESULT explore-highest-after-fail 53 2 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT explore-highest-after-fail 73 2 repaired q=31 c=8 r=16 b=7 mcs=3433 mus=2719 relax=5 t=92s
+RESULT explore-highest-after-fail 82 2 repaired q=31 c=8 r=16 b=7 mcs=3010 mus=2151 relax=7 t=60s
+RESULT explore-highest-after-fail 95 2 TIMEOUT
+RESULT explore-highest-after-fail 48 3 repaired q=58 c=12 r=36 b=10 mcs=2829 mus=2395 relax=6 t=143s
+RESULT explore-highest-after-fail 53 3 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=1s
+RESULT explore-highest-after-fail 73 3 repaired q=29 c=7 r=17 b=5 mcs=32 mus=38 relax=5 t=1s
+RESULT explore-highest-after-fail 82 3 repaired q=23 c=6 r=12 b=5 mcs=1474 mus=1096 relax=7 t=19s
+RESULT explore-highest-after-fail 95 3 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT explore-highest-after-fail 48 4 repaired q=56 c=12 r=34 b=10 mcs=3815 mus=3083 relax=6 t=131s
+RESULT explore-highest-after-fail 53 4 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=1s
+RESULT explore-highest-after-fail 73 4 repaired q=38 c=9 r=21 b=8 mcs=3216 mus=2487 relax=5 t=76s
+RESULT explore-highest-after-fail 82 4 repaired q=25 c=7 r=13 b=5 mcs=483 mus=257 relax=7 t=5s
+RESULT explore-highest-after-fail 95 4 TIMEOUT

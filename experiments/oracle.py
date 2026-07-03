@@ -577,7 +577,7 @@ class HierarchicalOracle:
         # (1) COMMIT: pick a committable state-relative GMCS according to `commit_strategy`.
         options = [M for M in self.gmcs
                    if (open_names, M) not in self.abandoned and self._committable(M, open_names)]
-        if self.commit_strategy == "explore-after-fail" and self.cooldown:
+        if self.commit_strategy in ("explore-after-fail", "explore-highest-after-fail") and self.cooldown:
             # cooldown after a dead end: skip the commit step entirely for one decision and
             # perform a RANDOM exploration step instead (any relevant, potentially-suitable
             # branch -- not necessarily the current one), so fresh conflict structure is
@@ -635,7 +635,7 @@ class HierarchicalOracle:
                 leaves = [g for g in M if self._is_leaf(g)]
                 return (len(leaves) == len(M), len(leaves))
             if self.commit_strategy in ("first", "lookahead", "mus-hit", "mus-hit-learn",
-                                        "explore-after-fail"):
+                                        "explore-after-fail", "explore-highest-after-fail"):
                 M = options[0]
             elif self.commit_strategy == "random":
                 M = self.rng.choice(options)
@@ -688,6 +688,14 @@ class HierarchicalOracle:
         branch = [c for c in cands if self._in_current_branch(c)]
         if self.commit_strategy == "explore-after-fail" and self.cooldown and cands:
             pick, why = self.rng.choice(cands), "cooldown-random"  # forced random step after a dead end
+            self.cooldown = 0
+        elif self.commit_strategy == "explore-highest-after-fail" and self.cooldown and cands:
+            # forced step after a dead end, at the MOST ABSTRACT frontier group: refine a
+            # candidate of minimal level (ties broken at random), so post-failure exploration
+            # widens the view at the coarsest available granularity instead of digging deeper.
+            lo = min(self.name2node[c].level() for c in cands)
+            highest = [c for c in cands if self.name2node[c].level() == lo]
+            pick, why = self.rng.choice(highest), "cooldown-highest"
             self.cooldown = 0
         elif pend:
             pick, why = pend[0], "pending-committed-member"        # locate the leaves to relax in M
