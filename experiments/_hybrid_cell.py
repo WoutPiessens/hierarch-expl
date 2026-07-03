@@ -10,13 +10,71 @@ import sys, time
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from oracle import build_nurse_hierarchy, sample_suitable_set, run_hierarchical_oracle
+import cpmpy as cp
+from oracle import (build_nurse_hierarchy, sample_suitable_set, run_hierarchical_oracle,
+                    run_oracle, run_staged_deletion)
+from hierarchy_io import load_flat_instance
 
 strat, seed = sys.argv[1], int(sys.argv[2])
 rep = sys.argv[3] if len(sys.argv) > 3 else "0"
 root, hard = build_nurse_hierarchy("nurse_instance1_softreq_8nurses")
 S, sd = sample_suitable_set(root, hard, pct=40, seed0=seed)
 name2node = {nd.get_full_name(): nd for nd in root.iter_nodes()}
+
+
+def _to_leaf(n):
+    """flat soft-constraint name -> hierarchy leaf full name (same rule as build_nurse_hierarchy)."""
+    fam = n.split("__", 1)[0]
+    tag = n.split("__", 1)[1].split("_")
+    if fam in ("shift_on", "shift_off"):
+        return f"{fam} {tag[0]} {tag[1]}"
+    return f"{fam} week{int(tag[0][3:]) // 7} {tag[0]}"
+
+
+class _FixedS:
+    """Flat-method oracle over the SAME suitable set S (leaf names)."""
+    def __init__(self, S):
+        self.S = S
+    def evaluate(self, names):                 # baseline: accept an MCS iff fully inside S
+        return all(_to_leaf(n) in self.S for n in names)
+    def is_suitable(self, n):                  # staged-deletion: per-constraint suitability
+        return _to_leaf(n) in self.S
+    def stats(self):
+        return {}
+
+
+if strat in ("flat-baseline", "staged-deletion"):
+    soft, fhard, soft_names, _ = load_flat_instance("nurse_instance1_softreq_8nurses")
+    t0 = time.perf_counter()
+    if strat == "flat-baseline":
+        name_of = {id(c): n for c, n in zip(soft, soft_names)}
+        r = run_oracle("baseline", soft, fhard, name_of, _FixedS(S), max_iterations=5000,
+                       solver="exact", map_solver="exact")
+        ok = "repaired" if r["accepted"] else "failed"
+        print(f"RESULT {strat} {sd} {rep} {ok} q={r['n_mcs_seen']} c=0 r=0 b=0 "
+              f"mcs={r['n_mcs_seen']} mus={r['n_mus_seen']} "
+              f"relax={len(r['accepted']) if r['accepted'] else 0} t={time.perf_counter()-t0:.0f}s",
+              flush=True)
+    else:
+        r = run_staged_deletion(soft, fhard, soft_names, _FixedS(S),
+                                solver="exact", map_solver="exact", max_iterations=5000)
+        ok = "repaired" if r["reached_sat"] else "failed"
+        # minimality gap (evaluation only, not part of the oracle): greedily re-add relaxed
+        # constraints; what survives is a minimal correction subset.
+        excess = ""
+        if r["reached_sat"]:
+            cur = set(r["relaxed_names"])
+            def sat(dropped):
+                kept = [c for c, n in zip(soft, soft_names) if n not in dropped]
+                return cp.Model(fhard + kept).solve(solver="ortools") is True
+            for n in list(cur):
+                if sat(cur - {n}):
+                    cur.discard(n)
+            excess = f" min={len(cur)} excess={r['n_relaxed'] - len(cur)}"
+        print(f"RESULT {strat} {sd} {rep} {ok} q={r['n_decisions']} c=0 r=0 b=0 "
+              f"mcs={r['n_mcs_enumerated']} mus={r['n_mus_seen']} relax={r['n_relaxed']} "
+              f"t={time.perf_counter()-t0:.0f}s{excess}", flush=True)
+    sys.exit(0)
 
 def overlap(names):
     leaves = set()

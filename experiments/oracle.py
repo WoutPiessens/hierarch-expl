@@ -481,6 +481,7 @@ class HierarchicalOracle:
         self.n_relax_queries = 0                                   # total leaves relaxed by commits (1 query per relaxed constraint)
         self.n_lookahead_solves = 0                                # internal look-ahead SAT checks (not oracle queries)
         self.learned_conflicts = []                                # translated inner MUSes: (frozenset core, frozenset background) pairs
+        self.cooldown = 0                                          # explore-after-fail: forced exploration steps before the next commit
         self.result = None
         self.relaxed = []
 
@@ -576,6 +577,12 @@ class HierarchicalOracle:
         # (1) COMMIT: pick a committable state-relative GMCS according to `commit_strategy`.
         options = [M for M in self.gmcs
                    if (open_names, M) not in self.abandoned and self._committable(M, open_names)]
+        if self.commit_strategy == "explore-after-fail" and self.cooldown:
+            # cooldown after a dead end: skip the commit step entirely for one decision and
+            # perform a RANDOM exploration step instead (any relevant, potentially-suitable
+            # branch -- not necessarily the current one), so fresh conflict structure is
+            # enumerated before the next commit attempt.
+            options = []
         if options and self.commit_strategy == "mus-hit":
             # SOLVER-FREE dead-end filter via MARCO duality: every correction set must hit every
             # MUS. After committing M only leaves(M) ∩ S can ever be relaxed, so an enumerated
@@ -610,6 +617,11 @@ class HierarchicalOracle:
             def learned_dead(M):
                 ml = set().union(*(self._suitable_leaves_under(g) for g in M)) | relaxed_now
                 return any(not (cl & ml) for cl in self.learned_conflicts)
+            rejected = [M for M in options if learned_dead(M)]
+            if rejected:
+                self._log(ctx["round"], "reject",
+                          n_rejected=len(rejected), n_kept=len(options) - len(rejected),
+                          examples=[sorted(M) for M in rejected[:2]])
             options = [M for M in options if not learned_dead(M)]
 
         if options and self.commit_strategy == "lookahead":
@@ -622,7 +634,8 @@ class HierarchicalOracle:
             def leafness(M):        # (all-leaf?, #suitable leaf members) -- pure-leaf MCSes can't dead-end
                 leaves = [g for g in M if self._is_leaf(g)]
                 return (len(leaves) == len(M), len(leaves))
-            if self.commit_strategy in ("first", "lookahead", "mus-hit", "mus-hit-learn"):
+            if self.commit_strategy in ("first", "lookahead", "mus-hit", "mus-hit-learn",
+                                        "explore-after-fail"):
                 M = options[0]
             elif self.commit_strategy == "random":
                 M = self.rng.choice(options)
@@ -673,7 +686,10 @@ class HierarchicalOracle:
                  and nm in relevant                                # relevant (appears in a GMCS/GMUS)
                  and self._potentially_suitable(nm)]               # potentially suitable
         branch = [c for c in cands if self._in_current_branch(c)]
-        if pend:
+        if self.commit_strategy == "explore-after-fail" and self.cooldown and cands:
+            pick, why = self.rng.choice(cands), "cooldown-random"  # forced random step after a dead end
+            self.cooldown = 0
+        elif pend:
             pick, why = pend[0], "pending-committed-member"        # locate the leaves to relax in M
             self.pending = [p for p in self.pending if p != pick]
         elif branch:
@@ -681,6 +697,7 @@ class HierarchicalOracle:
         elif cands:
             pick, why = self.rng.choice(cands), "random-other-branch"  # jump to another open branch
         else:
+            self.cooldown = 0    # nothing refinable: don't let the cooldown suppress commits forever
             # Nothing to commit or refine. First: are we already repaired (the relaxed set is a
             # correction set, with the remaining open groups jointly satisfiable)? If so, stop.
             if self._is_repaired(set(self.relaxed)):
@@ -713,6 +730,9 @@ class HierarchicalOracle:
                 fs = frozenset(cl)
                 if fs not in self.learned_conflicts:
                     self.learned_conflicts.append(fs)
+                    self._log(ctx["round"], "learn", core=sorted(U), n_bg=len(b_full),
+                              conflict_leaves=len(fs),
+                              suitable_in_conflict=len(fs & self.S))
             # restore the previous epoch's registry: all MUSes/MCSes enumerated between the
             # previous commit and this frontier stay available for refinement & commitment.
             self.gmcs, self.gmus = gmcs, gmus
@@ -722,6 +742,7 @@ class HierarchicalOracle:
             self.last_refined, self.pending = last_ref, pending
             self.abandoned.add((open_sig, M))                     # don't re-commit M at that state
             self.n_backtrack += 1
+            self.cooldown = 1                                     # explore-after-fail: force one random exploration first
             self._log(ctx["round"], "backtrack", undone_mcs=sorted(M), depth=len(self.stack))
             return {"action": "restore", "state": hm_state}
 
