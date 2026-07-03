@@ -1,0 +1,31 @@
+{
+  "source": "nurse rostering: C:\\Users\\Wout\\nrp_data\\nurserostering\\Instance1.txt (schedulingbenchmarks.org instances1_24.zip)",
+  "built_by": "examples/nurserostering.py -> copied & extended to experiments/data/models/nurserostering.py: nurserostering_soft_hard_model() (structural rules HARD, shift_on/shift_off/cover SOFT -- no objective)",
+  "nurse_ids": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+  ],
+  "n_nurses": 6,
+  "horizon": 14,
+  "shift_ids": [
+    "D"
+  ],
+  "hard_soft_split": {
+    "hard": "structural rostering rules (cannot-follow, per-type max shifts, min/max total minutes, max/min consecutive shifts, min consecutive days off, max weekends, fixed days-off) -- always enforced, never in an MCS",
+    "soft": "shift-on requests (nurse works shift S on day d), shift-off requests (nurse avoids shift S on day d), and cover requirements (Count(day,shift)==req, posted WITHOUT slack vars) -- relaxable, the MCS candidates. Originally these were weighted penalty terms in nurserostering_model's objective."
+  },
+  "transformations": [
+    "1. nurse subset: first N_NURSES nurses in source order (no cherry-picking)",
+    "2. horizon: kept at the instance's FULL horizon (not shrunk -- truncating it makes the structural HARD constraints infeasible)",
+    "3. shift types: all shift types of the instance",
+    "4. flattening: toplevel_list(hard, merge_and=False) splits vectorized cannot-follow HARD constraints into scalar atoms; soft constraints are already scalar",
+    "5. hard/soft: structural rules HARD, shift_on/shift_off/cover SOFT (no objective) -- per task instructions"
+  ],
+  "note": "Instance1 chosen (not Instance13, used by build_nurse_instance.py) BECAUSE its hard part is satisfiable while its optimal penalty is > 0 (607), so hard+soft is UNSAT. Both properties are re-verified by assertions in this builder.",
+  "num_soft": 33,
+  "num_hard": 240
+}

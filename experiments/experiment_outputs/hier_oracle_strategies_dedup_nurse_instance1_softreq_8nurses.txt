@@ -1,0 +1,20 @@
+# DEFINITIVE configuration -- semantic-augmentation blocking (no assumption vars in blocks):
+#   MCS blocks: any(down[M] + down[relaxed])   (dedup of the already-found M UNION R)
+#   MUS blocks: ~all(up[C] + up[background])   (state-independent fact: C+B UNSAT)
+# Oracle keeps M'UNION R knowledge across backtracks (translated commit candidates).
+# query q = one oracle decision (commit/refine/backtrack); mcs/mus = enumerated start->repair.
+RESULT first 48 repaired q=51 c=11 r=31 b=9 mcs=818 mus=407 relax=6 t=11s
+RESULT first 53 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=1s
+RESULT first 73 repaired q=20 c=6 r=11 b=3 mcs=22 mus=26 relax=5 t=1s
+RESULT first 82 repaired q=24 c=7 r=13 b=4 mcs=286 mus=140 relax=7 t=3s
+RESULT first 95 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT random 48 repaired q=78 c=19 r=43 b=16 mcs=837 mus=408 relax=6 t=12s
+RESULT random 53 repaired q=12 c=4 r=7 b=1 mcs=19 mus=22 relax=5 t=1s
+RESULT random 73 repaired q=16 c=5 r=9 b=2 mcs=21 mus=26 relax=5 t=1s
+RESULT random 82 repaired q=34 c=9 r=19 b=6 mcs=296 mus=165 relax=7 t=3s
+RESULT random 95 repaired q=72 c=17 r=39 b=16 mcs=306 mus=191 relax=5 t=5s
+RESULT lookahead 48 repaired q=9 c=2 r=7 b=0 mcs=667 mus=279 relax=6 t=6s
+RESULT lookahead 53 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT lookahead 73 repaired q=7 c=2 r=5 b=0 mcs=282 mus=129 relax=5 t=2s
+RESULT lookahead 82 repaired q=9 c=3 r=6 b=0 mcs=283 mus=131 relax=7 t=2s
+RESULT lookahead 95 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s

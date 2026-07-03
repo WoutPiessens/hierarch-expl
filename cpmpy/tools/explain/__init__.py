@@ -20,11 +20,12 @@ List of tools
     marco
     hierarchical
     hierarchical_marco
+    map_incremental_marco
     utils
 """
 
 from .hierarchical import ConstraintNode, constraint_node_from_dict, constraint_node_to_dict
-from .hierarchical_marco import hierarchical_marco
+from .hierarchical_marco import hierarchical_marco, map_incremental_marco
 from .marco import marco
 from .mcs import mcs, mcs_grow, mcs_grow_naive, mcs_opt
 from .mss import mss, mss_grow, mss_grow_naive, mss_opt
@@ -50,6 +51,7 @@ __all__ = [
     "constraint_node_to_dict",
     "hierarchical_marco",
     "make_assump_model",
+    "map_incremental_marco",
     "marco",
     "mcs",
     "mcs_grow",

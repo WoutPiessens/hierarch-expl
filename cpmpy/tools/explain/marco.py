@@ -11,7 +11,7 @@ from .utils import make_assump_model
 
 
 
-def marco(soft, hard=[], solver="ortools", map_solver="ortools", return_mus=True, return_mcs=True, do_solution_hint=True, enum_timing=None):
+def marco(soft, hard=[], solver="ortools", map_solver="ortools", return_mus=True, return_mcs=True, do_solution_hint=True, enum_timing=None, log_events=None, name_of=None):
     """
         Enumerating minimal unsatisfiable subsets (MUSes) and minimal correction sets (MCSes)
         of unsatisfiable constraints.
@@ -33,6 +33,12 @@ def marco(soft, hard=[], solver="ortools", map_solver="ortools", return_mus=True
                                      to return MUSes. Especially useful when `return_mus=True`.
         :param: enum_timing: optional list; if given, the wall-clock time of the full enumeration loop
                              (from the first map-solver call until the map solver returns UNSAT) is appended to it
+        :param: log_events: optional list; if given, one record is appended per map-solver iteration:
+                            ``{"type": "iter", "seed": [names], "kind": "MUS"/"MCS", "result": [names]}``,
+                            where the seed is the subset the map solver returned and the result is the
+                            MUS/MCS derived from it (chronological order)
+        :param: name_of: optional dict ``id(constraint) -> human-readable name``, used to render the
+                         ``log_events`` seed/result; falls back to a short object id if missing
 
     """
 
@@ -53,10 +59,14 @@ def marco(soft, hard=[], solver="ortools", map_solver="ortools", return_mus=True
 
     deletion_order = {a : -len(get_variables(dmap[a])) for a in assump} # avoid recomputing
 
+    def _nm(constraint):
+        return name_of.get(id(constraint), f"c@{id(constraint)}") if name_of else f"c@{id(constraint)}"
+
     _t_enum_start = time.perf_counter()
     while map_solver.solve():
 
         seed = [a for a in assump if a.value()]
+        seed_names = [_nm(dmap[a]) for a in seed] if log_events is not None else None
 
         if s.solve(assumptions=seed) is True:
             # SAT, grow, to full MSS
@@ -69,6 +79,9 @@ def marco(soft, hard=[], solver="ortools", map_solver="ortools", return_mus=True
             mcs = [a for a in assump if a not in frozenset(mss)] # take complement
             map_solver += cp.any(mcs) # block in map solver
 
+            if log_events is not None:
+                log_events.append({"type": "iter", "seed": seed_names, "kind": "MCS",
+                                   "result": [_nm(dmap[a]) for a in mcs]})
             if return_mcs:
                 yield "MCS", [dmap[a] for a in mcs]
 
@@ -86,6 +99,9 @@ def marco(soft, hard=[], solver="ortools", map_solver="ortools", return_mus=True
 
             map_solver += ~cp.all(core) # block in map solver
 
+            if log_events is not None:
+                log_events.append({"type": "iter", "seed": seed_names, "kind": "MUS",
+                                   "result": [_nm(dmap[a]) for a in core]})
             if return_mus:
                 yield "MUS", [dmap[a] for a in core]
 

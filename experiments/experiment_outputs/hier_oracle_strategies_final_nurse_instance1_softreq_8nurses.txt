@@ -1,0 +1,21 @@
+# FINAL configuration: user's backtracking model (frontier + previous-epoch registry restored,
+# relevance-restricted exploration, no merge) + epoch-guarded blocking clauses in hierarchical_marco.
+# Evidence for the guard: extra/demo_stale_blocks.py (0 vs 2 MCSes at the re-refined outer state).
+# query = one oracle decision (commit/refine/backtrack); mcs_enum/mus_enum = GMCSes/GMUSes
+# enumerated start->repair; relax_q = refines+backtracks+one-per-relaxed-leaf.
+  strategy  seed    result  queries  commit  refine  backtr  mcs_enum  mus_enum  relax_q  |relax|   time
+     first    48  repaired       81      18      48      15       876       478      105        6     9s
+     first    53  repaired        5       2       3       0        14        16        8        5     0s
+     first    73  repaired       20       6      11       3        23        26       26        5     1s
+     first    82  repaired       38      10      21       7       306       165       50        7     3s
+     first    95  repaired       45      10      26       9        91        90       57        5     2s
+    random    48  repaired       83      18      49      16       894       475      107        6     9s
+    random    53  repaired       12       4       7       1        20        22       15        5     1s
+    random    73  repaired       16       5       9       2        22        26       21        5     1s
+    random    82  repaired       44      11      24       9       307       182       55        7     4s
+    random    95  repaired       42       9      25       8        91        91       52        5     2s
+ lookahead    48  repaired       10       2       8       0      1450       705       14        6    17s
+ lookahead    53  repaired        5       2       3       0        14        16        8        5     1s
+ lookahead    73  repaired        8       3       5       0        18        18       10        5     1s
+ lookahead    82  repaired        9       1       8       0      1824      1506       15        7    33s
+ lookahead    95  repaired        6       1       5       0        98        78       10        5     3s

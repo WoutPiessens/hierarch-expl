@@ -1,0 +1,14 @@
+{
+  "source": "nurse rostering: C:\\Users\\Wout\\nrp_data\\nurserostering\\Instance7.txt (schedulingbenchmarks.org instances1_24.zip)",
+  "built_by": "experiments/data/models/nurserostering.py nurserostering_soft_hard_model() (structural HARD, shift_on/shift_off/cover SOFT); full staffing & horizon",
+  "n_nurses": 20,
+  "horizon": 28,
+  "shift_ids": [
+    "E",
+    "D",
+    "L"
+  ],
+  "note": "Larger MULTI-SHIFT instance. Full nurse complement and full horizon are used unchanged (slicing nurses makes single-shift covers infeasible; truncating the horizon breaks the structural hard constraints). hard SAT, hard+soft UNSAT; at shift granularity, shifts E and L are individually infeasible while D is feasible alone, so the shift-level correction set is {E, L}.",
+  "num_soft": 252,
+  "num_hard": 3315
+}
