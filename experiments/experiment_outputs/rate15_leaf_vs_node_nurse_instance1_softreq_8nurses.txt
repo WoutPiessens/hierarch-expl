@@ -1,0 +1,186 @@
+# 15% sampling campaign: 6 methods x 5 pre-verified feasible seeds x 3 reps, per sampling mode.
+# leaf seeds: 11099 18783 26665 27712 39044 (feasibility ~0.013%: 5 in ~39k draws)
+# node seeds: 11645 51709 53623 57595 99916 (feasibility ~0.005%: 5 in ~100k draws)
+# MCS size distribution: min 5 (16x), 6 (30x) of 5922 -- a 6-leaf budget must ~equal one of these.
+### MODE leaf (scattered primitives) ###
+RESULT selective-relaxation 11099 1 repaired q=4 c=0 r=0 b=0 mcs=4 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 18783 1 repaired q=5 c=0 r=0 b=0 mcs=5 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 26665 1 repaired q=4 c=0 r=0 b=0 mcs=4 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 27712 1 repaired q=6 c=0 r=0 b=0 mcs=6 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 39044 1 repaired q=6 c=0 r=0 b=0 mcs=6 mus=0 relax=6 t=1s min=5 excess=1
+RESULT lookahead 11099 1 repaired q=6 c=1 r=5 b=0 mcs=852 mus=487 relax=5 t=7s
+RESULT lookahead 18783 1 repaired q=12 c=3 r=8 b=1 mcs=61 mus=52 relax=5 t=1s
+RESULT lookahead 26665 1 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT lookahead 27712 1 repaired q=10 c=2 r=7 b=1 mcs=70 mus=70 relax=5 t=2s
+RESULT lookahead 39044 1 repaired q=6 c=1 r=5 b=0 mcs=88 mus=56 relax=5 t=2s
+RESULT explore-after-fail 11099 1 repaired q=18 c=5 r=11 b=2 mcs=21 mus=26 relax=5 t=1s
+RESULT explore-after-fail 18783 1 repaired q=12 c=3 r=8 b=1 mcs=61 mus=52 relax=5 t=1s
+RESULT explore-after-fail 26665 1 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT explore-after-fail 27712 1 repaired q=32 c=7 r=19 b=6 mcs=84 mus=89 relax=5 t=2s
+RESULT explore-after-fail 39044 1 repaired q=14 c=4 r=8 b=2 mcs=20 mus=22 relax=5 t=1s
+RESULT mus-hit-learn 11099 1 repaired q=13 c=4 r=8 b=1 mcs=20 mus=24 relax=5 t=1s
+RESULT mus-hit-learn 18783 1 repaired q=14 c=4 r=8 b=2 mcs=23 mus=24 relax=5 t=1s
+RESULT mus-hit-learn 26665 1 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT mus-hit-learn 27712 1 repaired q=17 c=3 r=12 b=2 mcs=77 mus=80 relax=5 t=1s
+RESULT mus-hit-learn 39044 1 repaired q=19 c=5 r=10 b=4 mcs=98 mus=78 relax=5 t=1s
+RESULT random 11099 1 repaired q=23 c=6 r=12 b=5 mcs=1443 mus=999 relax=5 t=19s
+RESULT random 18783 1 repaired q=11 c=3 r=7 b=1 mcs=22 mus=21 relax=5 t=1s
+RESULT random 26665 1 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT random 27712 1 repaired q=24 c=5 r=15 b=4 mcs=60 mus=71 relax=5 t=2s
+RESULT random 39044 1 repaired q=19 c=5 r=10 b=4 mcs=98 mus=78 relax=5 t=2s
+RESULT flat-baseline 11099 1 repaired q=104 c=0 r=0 b=0 mcs=104 mus=250 relax=5 t=1s
+RESULT flat-baseline 18783 1 repaired q=68 c=0 r=0 b=0 mcs=68 mus=161 relax=5 t=1s
+RESULT flat-baseline 26665 1 repaired q=82 c=0 r=0 b=0 mcs=82 mus=200 relax=5 t=1s
+RESULT flat-baseline 27712 1 repaired q=61 c=0 r=0 b=0 mcs=61 mus=135 relax=5 t=1s
+RESULT flat-baseline 39044 1 repaired q=164 c=0 r=0 b=0 mcs=164 mus=310 relax=5 t=2s
+RESULT selective-relaxation 11099 2 repaired q=3 c=0 r=0 b=0 mcs=3 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 18783 2 repaired q=4 c=0 r=0 b=0 mcs=4 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 26665 2 repaired q=5 c=0 r=0 b=0 mcs=5 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 27712 2 repaired q=10 c=0 r=0 b=0 mcs=10 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 39044 2 repaired q=3 c=0 r=0 b=0 mcs=3 mus=0 relax=5 t=1s min=5 excess=0
+RESULT lookahead 11099 2 repaired q=6 c=1 r=5 b=0 mcs=852 mus=487 relax=5 t=7s
+RESULT lookahead 18783 2 repaired q=10 c=3 r=7 b=0 mcs=25 mus=24 relax=5 t=1s
+RESULT lookahead 26665 2 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT lookahead 27712 2 repaired q=10 c=2 r=7 b=1 mcs=70 mus=70 relax=5 t=2s
+RESULT lookahead 39044 2 repaired q=10 c=3 r=6 b=1 mcs=20 mus=20 relax=5 t=1s
+RESULT explore-after-fail 11099 2 repaired q=18 c=5 r=10 b=3 mcs=610 mus=275 relax=5 t=4s
+RESULT explore-after-fail 18783 2 repaired q=12 c=3 r=8 b=1 mcs=61 mus=52 relax=5 t=1s
+RESULT explore-after-fail 26665 2 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT explore-after-fail 27712 2 repaired q=31 c=7 r=18 b=6 mcs=61 mus=76 relax=5 t=1s
+RESULT explore-after-fail 39044 2 repaired q=16 c=4 r=9 b=3 mcs=98 mus=74 relax=5 t=1s
+RESULT mus-hit-learn 11099 2 repaired q=15 c=4 r=9 b=2 mcs=284 mus=138 relax=5 t=2s
+RESULT mus-hit-learn 18783 2 repaired q=20 c=4 r=13 b=3 mcs=1193 mus=593 relax=5 t=10s
+RESULT mus-hit-learn 26665 2 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT mus-hit-learn 27712 2 repaired q=18 c=3 r=13 b=2 mcs=61 mus=76 relax=5 t=1s
+RESULT mus-hit-learn 39044 2 repaired q=14 c=4 r=8 b=2 mcs=20 mus=22 relax=5 t=1s
+RESULT random 11099 2 repaired q=15 c=4 r=9 b=2 mcs=284 mus=138 relax=5 t=2s
+RESULT random 18783 2 repaired q=10 c=3 r=7 b=0 mcs=25 mus=24 relax=5 t=1s
+RESULT random 26665 2 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT random 27712 2 repaired q=30 c=6 r=19 b=5 mcs=67 mus=78 relax=5 t=1s
+RESULT random 39044 2 repaired q=14 c=4 r=8 b=2 mcs=20 mus=22 relax=5 t=1s
+RESULT flat-baseline 11099 2 repaired q=273 c=0 r=0 b=0 mcs=273 mus=456 relax=5 t=3s
+RESULT flat-baseline 18783 2 repaired q=48 c=0 r=0 b=0 mcs=48 mus=144 relax=5 t=1s
+RESULT flat-baseline 26665 2 repaired q=28 c=0 r=0 b=0 mcs=28 mus=103 relax=5 t=0s
+RESULT flat-baseline 27712 2 repaired q=75 c=0 r=0 b=0 mcs=75 mus=182 relax=5 t=1s
+RESULT flat-baseline 39044 2 repaired q=103 c=0 r=0 b=0 mcs=103 mus=241 relax=5 t=1s
+RESULT selective-relaxation 11099 3 repaired q=3 c=0 r=0 b=0 mcs=3 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 18783 3 repaired q=5 c=0 r=0 b=0 mcs=5 mus=0 relax=6 t=1s min=5 excess=1
+RESULT selective-relaxation 26665 3 repaired q=6 c=0 r=0 b=0 mcs=6 mus=0 relax=6 t=1s min=5 excess=1
+RESULT selective-relaxation 27712 3 repaired q=1 c=0 r=0 b=0 mcs=1 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 39044 3 repaired q=9 c=0 r=0 b=0 mcs=9 mus=0 relax=5 t=1s min=5 excess=0
+RESULT lookahead 11099 3 repaired q=7 c=2 r=5 b=0 mcs=282 mus=129 relax=5 t=2s
+RESULT lookahead 18783 3 repaired q=12 c=3 r=8 b=1 mcs=61 mus=52 relax=5 t=1s
+RESULT lookahead 26665 3 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT lookahead 27712 3 repaired q=7 c=1 r=6 b=0 mcs=59 mus=61 relax=5 t=2s
+RESULT lookahead 39044 3 repaired q=9 c=2 r=6 b=1 mcs=98 mus=69 relax=5 t=2s
+RESULT explore-after-fail 11099 3 repaired q=20 c=5 r=12 b=3 mcs=615 mus=288 relax=5 t=4s
+RESULT explore-after-fail 18783 3 repaired q=16 c=5 r=9 b=2 mcs=90 mus=62 relax=5 t=1s
+RESULT explore-after-fail 26665 3 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT explore-after-fail 27712 3 repaired q=29 c=6 r=18 b=5 mcs=79 mus=83 relax=5 t=1s
+RESULT explore-after-fail 39044 3 repaired q=14 c=4 r=8 b=2 mcs=20 mus=22 relax=5 t=1s
+RESULT mus-hit-learn 11099 3 repaired q=13 c=4 r=8 b=1 mcs=20 mus=24 relax=5 t=1s
+RESULT mus-hit-learn 18783 3 repaired q=14 c=4 r=8 b=2 mcs=23 mus=24 relax=5 t=1s
+RESULT mus-hit-learn 26665 3 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT mus-hit-learn 27712 3 repaired q=21 c=4 r=14 b=3 mcs=83 mus=84 relax=5 t=1s
+RESULT mus-hit-learn 39044 3 repaired q=14 c=4 r=8 b=2 mcs=20 mus=22 relax=5 t=1s
+RESULT random 11099 3 repaired q=13 c=4 r=8 b=1 mcs=20 mus=24 relax=5 t=1s
+RESULT random 18783 3 repaired q=11 c=3 r=7 b=1 mcs=22 mus=21 relax=5 t=1s
+RESULT random 26665 3 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT random 27712 3 repaired q=30 c=6 r=19 b=5 mcs=67 mus=78 relax=5 t=1s
+RESULT random 39044 3 repaired q=24 c=7 r=11 b=6 mcs=88 mus=63 relax=5 t=1s
+RESULT flat-baseline 11099 3 repaired q=66 c=0 r=0 b=0 mcs=66 mus=156 relax=5 t=1s
+RESULT flat-baseline 18783 3 repaired q=39 c=0 r=0 b=0 mcs=39 mus=103 relax=5 t=1s
+RESULT flat-baseline 26665 3 repaired q=96 c=0 r=0 b=0 mcs=96 mus=200 relax=5 t=1s
+RESULT flat-baseline 27712 3 repaired q=78 c=0 r=0 b=0 mcs=78 mus=191 relax=5 t=1s
+RESULT flat-baseline 39044 3 repaired q=105 c=0 r=0 b=0 mcs=105 mus=200 relax=5 t=1s
+### MODE node (hierarchy-aware) ###
+RESULT selective-relaxation 11645 1 repaired q=5 c=0 r=0 b=0 mcs=5 mus=0 relax=6 t=1s min=5 excess=1
+RESULT selective-relaxation 51709 1 repaired q=4 c=0 r=0 b=0 mcs=4 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 53623 1 repaired q=4 c=0 r=0 b=0 mcs=4 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 57595 1 repaired q=4 c=0 r=0 b=0 mcs=4 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 99916 1 repaired q=9 c=0 r=0 b=0 mcs=9 mus=0 relax=5 t=1s min=5 excess=0
+RESULT lookahead 11645 1 repaired q=11 c=2 r=8 b=1 mcs=1195 mus=558 relax=5 t=12s
+RESULT lookahead 51709 1 repaired q=10 c=3 r=6 b=1 mcs=20 mus=20 relax=5 t=2s
+RESULT lookahead 53623 1 repaired q=8 c=3 r=5 b=0 mcs=21 mus=21 relax=5 t=1s
+RESULT lookahead 57595 1 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT lookahead 99916 1 repaired q=9 c=1 r=8 b=0 mcs=1036 mus=589 relax=5 t=11s
+RESULT explore-after-fail 11645 1 repaired q=24 c=5 r=15 b=4 mcs=1355 mus=609 relax=5 t=14s
+RESULT explore-after-fail 51709 1 repaired q=14 c=4 r=8 b=2 mcs=20 mus=22 relax=5 t=1s
+RESULT explore-after-fail 53623 1 repaired q=15 c=4 r=8 b=3 mcs=88 mus=59 relax=5 t=1s
+RESULT explore-after-fail 57595 1 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT explore-after-fail 99916 1 repaired q=12 c=4 r=8 b=0 mcs=26 mus=25 relax=5 t=1s
+RESULT mus-hit-learn 11645 1 repaired q=24 c=5 r=15 b=4 mcs=80 mus=90 relax=5 t=2s
+RESULT mus-hit-learn 51709 1 repaired q=14 c=4 r=8 b=2 mcs=20 mus=22 relax=5 t=1s
+RESULT mus-hit-learn 53623 1 repaired q=18 c=5 r=10 b=3 mcs=100 mus=84 relax=5 t=1s
+RESULT mus-hit-learn 57595 1 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT mus-hit-learn 99916 1 repaired q=11 c=3 r=8 b=0 mcs=62 mus=53 relax=5 t=1s
+RESULT random 11645 1 repaired q=16 c=4 r=10 b=2 mcs=68 mus=65 relax=5 t=1s
+RESULT random 51709 1 repaired q=14 c=4 r=8 b=2 mcs=20 mus=22 relax=5 t=1s
+RESULT random 53623 1 repaired q=18 c=5 r=10 b=3 mcs=100 mus=84 relax=5 t=1s
+RESULT random 57595 1 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT random 99916 1 repaired q=13 c=4 r=8 b=1 mcs=24 mus=25 relax=5 t=1s
+RESULT flat-baseline 11645 1 repaired q=124 c=0 r=0 b=0 mcs=124 mus=249 relax=5 t=2s
+RESULT flat-baseline 51709 1 repaired q=148 c=0 r=0 b=0 mcs=148 mus=262 relax=5 t=2s
+RESULT flat-baseline 53623 1 repaired q=62 c=0 r=0 b=0 mcs=62 mus=148 relax=5 t=1s
+RESULT flat-baseline 57595 1 repaired q=21 c=0 r=0 b=0 mcs=21 mus=83 relax=5 t=1s
+RESULT flat-baseline 99916 1 repaired q=51 c=0 r=0 b=0 mcs=51 mus=141 relax=5 t=1s
+RESULT selective-relaxation 11645 2 repaired q=3 c=0 r=0 b=0 mcs=3 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 51709 2 repaired q=2 c=0 r=0 b=0 mcs=2 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 53623 2 repaired q=6 c=0 r=0 b=0 mcs=6 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 57595 2 repaired q=4 c=0 r=0 b=0 mcs=4 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 99916 2 repaired q=11 c=0 r=0 b=0 mcs=11 mus=0 relax=5 t=1s min=5 excess=0
+RESULT lookahead 11645 2 repaired q=11 c=2 r=8 b=1 mcs=1349 mus=600 relax=5 t=14s
+RESULT lookahead 51709 2 repaired q=11 c=2 r=8 b=1 mcs=733 mus=284 relax=5 t=8s
+RESULT lookahead 53623 2 repaired q=8 c=3 r=5 b=0 mcs=21 mus=21 relax=5 t=1s
+RESULT lookahead 57595 2 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT lookahead 99916 2 repaired q=9 c=2 r=7 b=0 mcs=22 mus=21 relax=5 t=1s
+RESULT explore-after-fail 11645 2 repaired q=16 c=4 r=10 b=2 mcs=32 mus=29 relax=5 t=1s
+RESULT explore-after-fail 51709 2 repaired q=20 c=5 r=11 b=4 mcs=632 mus=253 relax=5 t=4s
+RESULT explore-after-fail 53623 2 repaired q=11 c=4 r=6 b=1 mcs=21 mus=23 relax=5 t=1s
+RESULT explore-after-fail 57595 2 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT explore-after-fail 99916 2 repaired q=25 c=5 r=16 b=4 mcs=1031 mus=594 relax=5 t=10s
+RESULT mus-hit-learn 11645 2 repaired q=21 c=4 r=14 b=3 mcs=63 mus=81 relax=5 t=1s
+RESULT mus-hit-learn 51709 2 repaired q=26 c=5 r=17 b=4 mcs=656 mus=259 relax=5 t=4s
+RESULT mus-hit-learn 53623 2 repaired q=11 c=4 r=6 b=1 mcs=21 mus=23 relax=5 t=1s
+RESULT mus-hit-learn 57595 2 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT mus-hit-learn 99916 2 repaired q=13 c=4 r=8 b=1 mcs=24 mus=25 relax=5 t=1s
+RESULT random 11645 2 repaired q=16 c=4 r=10 b=2 mcs=32 mus=29 relax=5 t=1s
+RESULT random 51709 2 repaired q=14 c=4 r=8 b=2 mcs=20 mus=22 relax=5 t=1s
+RESULT random 53623 2 repaired q=11 c=4 r=6 b=1 mcs=21 mus=23 relax=5 t=1s
+RESULT random 57595 2 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT random 99916 2 repaired q=13 c=3 r=9 b=1 mcs=61 mus=52 relax=5 t=1s
+RESULT flat-baseline 11645 2 repaired q=6 c=0 r=0 b=0 mcs=6 mus=44 relax=5 t=0s
+RESULT flat-baseline 51709 2 repaired q=70 c=0 r=0 b=0 mcs=70 mus=190 relax=5 t=1s
+RESULT flat-baseline 53623 2 repaired q=33 c=0 r=0 b=0 mcs=33 mus=111 relax=5 t=1s
+RESULT flat-baseline 57595 2 repaired q=37 c=0 r=0 b=0 mcs=37 mus=106 relax=5 t=1s
+RESULT flat-baseline 99916 2 repaired q=39 c=0 r=0 b=0 mcs=39 mus=103 relax=5 t=1s
+RESULT selective-relaxation 11645 3 repaired q=3 c=0 r=0 b=0 mcs=3 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 51709 3 repaired q=3 c=0 r=0 b=0 mcs=3 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 53623 3 repaired q=3 c=0 r=0 b=0 mcs=3 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 57595 3 repaired q=3 c=0 r=0 b=0 mcs=3 mus=0 relax=5 t=1s min=5 excess=0
+RESULT selective-relaxation 99916 3 repaired q=9 c=0 r=0 b=0 mcs=9 mus=0 relax=5 t=1s min=5 excess=0
+RESULT lookahead 11645 3 repaired q=8 c=1 r=7 b=0 mcs=1397 mus=567 relax=5 t=12s
+RESULT lookahead 51709 3 repaired q=10 c=3 r=6 b=1 mcs=20 mus=20 relax=5 t=2s
+RESULT lookahead 53623 3 repaired q=8 c=3 r=5 b=0 mcs=21 mus=21 relax=5 t=1s
+RESULT lookahead 57595 3 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT lookahead 99916 3 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT explore-after-fail 11645 3 repaired q=16 c=4 r=10 b=2 mcs=68 mus=65 relax=5 t=1s
+RESULT explore-after-fail 51709 3 repaired q=14 c=4 r=8 b=2 mcs=20 mus=22 relax=5 t=1s
+RESULT explore-after-fail 53623 3 repaired q=11 c=4 r=6 b=1 mcs=21 mus=23 relax=5 t=1s
+RESULT explore-after-fail 57595 3 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT explore-after-fail 99916 3 repaired q=25 c=7 r=13 b=5 mcs=1387 mus=554 relax=5 t=13s
+RESULT mus-hit-learn 11645 3 repaired q=22 c=4 r=15 b=3 mcs=1398 mus=587 relax=5 t=12s
+RESULT mus-hit-learn 51709 3 repaired q=26 c=5 r=17 b=4 mcs=656 mus=259 relax=5 t=5s
+RESULT mus-hit-learn 53623 3 repaired q=14 c=3 r=9 b=2 mcs=90 mus=68 relax=5 t=1s
+RESULT mus-hit-learn 57595 3 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT mus-hit-learn 99916 3 repaired q=13 c=4 r=8 b=1 mcs=24 mus=25 relax=5 t=1s
+RESULT random 11645 3 repaired q=43 c=11 r=22 b=10 mcs=63 mus=81 relax=5 t=2s
+RESULT random 51709 3 repaired q=14 c=4 r=8 b=2 mcs=20 mus=22 relax=5 t=1s
+RESULT random 53623 3 repaired q=11 c=4 r=6 b=1 mcs=21 mus=23 relax=5 t=1s
+RESULT random 57595 3 repaired q=10 c=3 r=7 b=0 mcs=23 mus=22 relax=5 t=1s
+RESULT random 99916 3 repaired q=12 c=4 r=8 b=0 mcs=26 mus=25 relax=5 t=1s
+RESULT flat-baseline 11645 3 repaired q=6 c=0 r=0 b=0 mcs=6 mus=47 relax=5 t=0s
+RESULT flat-baseline 51709 3 repaired q=147 c=0 r=0 b=0 mcs=147 mus=268 relax=5 t=1s
+RESULT flat-baseline 53623 3 repaired q=42 c=0 r=0 b=0 mcs=42 mus=119 relax=5 t=1s
+RESULT flat-baseline 57595 3 repaired q=72 c=0 r=0 b=0 mcs=72 mus=164 relax=5 t=1s
+RESULT flat-baseline 99916 3 repaired q=44 c=0 r=0 b=0 mcs=44 mus=118 relax=5 t=1s

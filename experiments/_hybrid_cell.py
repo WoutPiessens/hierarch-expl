@@ -1,5 +1,8 @@
 """One (strategy, seed) cell of the strategy suite; run in a subprocess with a timeout.
-Usage: python _hybrid_cell.py <strategy> <seed> [rep]
+Usage: python _hybrid_cell.py <strategy> <seed> [rep] [pct] [leaf|node]
+  pct  -- suitable-set sampling rate (default 40)
+  mode -- 'leaf' (scattered primitives, default) or 'node' (hierarchy-aware clustered sampling)
+'selective-relaxation' is the current name of the staged-deletion baseline.
 Prints one RESULT line plus one COMMIT line per commit decision, with features:
   size    = |M| (number of group members of the committed GMCS)
   overlap = |leaves(M) ∩ S| (suitable primitives in M's subtrees -- the branch's relaxation budget)
@@ -11,14 +14,24 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import cpmpy as cp
-from oracle import (build_nurse_hierarchy, sample_suitable_set, run_hierarchical_oracle,
-                    run_oracle, run_staged_deletion)
+from oracle import (build_nurse_hierarchy, sample_suitable_set, sample_suitable_nodes,
+                    run_hierarchical_oracle, run_oracle, run_staged_deletion)
 from hierarchy_io import load_flat_instance
 
 strat, seed = sys.argv[1], int(sys.argv[2])
 rep = sys.argv[3] if len(sys.argv) > 3 else "0"
+pct = float(sys.argv[4]) if len(sys.argv) > 4 else 40
+mode = sys.argv[5] if len(sys.argv) > 5 else "leaf"
+if strat == "selective-relaxation":                     # current name of the staged-deletion baseline
+    strat_impl = "staged-deletion"
+else:
+    strat_impl = strat
 root, hard = build_nurse_hierarchy("nurse_instance1_softreq_8nurses")
-S, sd = sample_suitable_set(root, hard, pct=40, seed0=seed)
+if mode == "node":
+    S, sd, _sel = sample_suitable_nodes(root, hard, pct=pct, seed0=seed)
+else:
+    S, sd = sample_suitable_set(root, hard, pct=pct, seed0=seed)
+assert sd == seed, f"seed {seed} not feasible at {pct}% ({mode}); first feasible: {sd}"
 name2node = {nd.get_full_name(): nd for nd in root.iter_nodes()}
 
 
@@ -43,10 +56,10 @@ class _FixedS:
         return {}
 
 
-if strat in ("flat-baseline", "staged-deletion"):
+if strat_impl in ("flat-baseline", "staged-deletion"):
     soft, fhard, soft_names, _ = load_flat_instance("nurse_instance1_softreq_8nurses")
     t0 = time.perf_counter()
-    if strat == "flat-baseline":
+    if strat_impl == "flat-baseline":
         name_of = {id(c): n for c, n in zip(soft, soft_names)}
         r = run_oracle("baseline", soft, fhard, name_of, _FixedS(S), max_iterations=5000,
                        solver="exact", map_solver="exact")
