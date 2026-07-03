@@ -480,6 +480,7 @@ class HierarchicalOracle:
         self.n_gmcs_seen = self.n_gmus_seen = 0
         self.n_relax_queries = 0                                   # total leaves relaxed by commits (1 query per relaxed constraint)
         self.n_lookahead_solves = 0                                # internal look-ahead SAT checks (not oracle queries)
+        self.learned_conflicts = []                                # translated inner MUSes: (frozenset core, frozenset background) pairs
         self.result = None
         self.relaxed = []
 
@@ -575,6 +576,42 @@ class HierarchicalOracle:
         # (1) COMMIT: pick a committable state-relative GMCS according to `commit_strategy`.
         options = [M for M in self.gmcs
                    if (open_names, M) not in self.abandoned and self._committable(M, open_names)]
+        if options and self.commit_strategy == "mus-hit":
+            # SOLVER-FREE dead-end filter via MARCO duality: every correction set must hit every
+            # MUS. After committing M only leaves(M) ∩ S can ever be relaxed, so an enumerated
+            # GMUS U with leaves(U) ∩ leaves(M) ∩ S = ∅ can never be defused inside the branch
+            # -> M is provably dead by set intersection alone. Among survivors, prefer the one
+            # whose WORST-covered known MUS is best covered (bottleneck, not total overlap).
+            def _mleaves(M):
+                return set().union(*(self._suitable_leaves_under(g) for g in M))
+
+            def _uleaves(U):
+                return set().union(*({lf.get_full_name() for lf in self.name2node[u].leaves()}
+                                     for u in U))
+            ucache = [_uleaves(U) for U in self.gmus]
+
+            def hits_all(M):
+                ml = _mleaves(M)
+                return all(ul & ml for ul in ucache)
+
+            def bottleneck(M):
+                ml = _mleaves(M)
+                return min((len(ul & ml) for ul in ucache), default=0)
+            viable = [M for M in options if hits_all(M)]
+            options = sorted(viable, key=bottleneck, reverse=True)
+
+        if options and self.commit_strategy == "mus-hit-learn":
+            # H1 + failure-learning: reject any option M whose commit would re-enforce a LEARNED
+            # conflict (C, B_delta) in full -- i.e. no constraint of C ∪ B_delta is already
+            # relaxed or relaxable (suitable leaf) inside M. Provably dead (C+B is UNSAT
+            # regardless of state). Discovery order kept among survivors (no reordering).
+            relaxed_now = set(self.relaxed)
+
+            def learned_dead(M):
+                ml = set().union(*(self._suitable_leaves_under(g) for g in M)) | relaxed_now
+                return any(not (cl & ml) for cl in self.learned_conflicts)
+            options = [M for M in options if not learned_dead(M)]
+
         if options and self.commit_strategy == "lookahead":
             # prune every option that provably cannot complete a repair (one solve each); among
             # the survivors, pick the one whose subtrees hold the fewest suitable leaves (the
@@ -585,7 +622,7 @@ class HierarchicalOracle:
             def leafness(M):        # (all-leaf?, #suitable leaf members) -- pure-leaf MCSes can't dead-end
                 leaves = [g for g in M if self._is_leaf(g)]
                 return (len(leaves) == len(M), len(leaves))
-            if self.commit_strategy in ("first", "lookahead"):
+            if self.commit_strategy in ("first", "lookahead", "mus-hit", "mus-hit-learn"):
                 M = options[0]
             elif self.commit_strategy == "random":
                 M = self.rng.choice(options)
@@ -662,6 +699,20 @@ class HierarchicalOracle:
             # that knowledge here by translating each inner GMCS before restoring the registry.
             r_delta = frozenset(g for g in M if self._is_leaf(g))  # leaves relaxed by the popped commit
             translated = [fs | r_delta for fs in self.gmcs]
+            # LEARN the abandoned epoch's conflicts (for the mus-hit-learn filter): an inner MUS
+            # C under the epoch's FULL background B is the state-independent fact "C + B is
+            # UNSAT" (cf. the up[B]-augmented blocks). B must be the full background (including
+            # enclosing epochs'), else the fact over-claims after deeper backtracks. Store the
+            # conflict's LEAF set, precomputed once: a future commit that leaves that whole set
+            # enforced (no member relaxed or relaxable) is provably dead.
+            b_full = set(ctx["committed_background"])
+            for U in self.gmus:
+                cl = set()
+                for u in (set(U) | b_full):
+                    cl.update(lf.get_full_name() for lf in self.name2node[u].leaves())
+                fs = frozenset(cl)
+                if fs not in self.learned_conflicts:
+                    self.learned_conflicts.append(fs)
             # restore the previous epoch's registry: all MUSes/MCSes enumerated between the
             # previous commit and this frontier stay available for refinement & commitment.
             self.gmcs, self.gmus = gmcs, gmus

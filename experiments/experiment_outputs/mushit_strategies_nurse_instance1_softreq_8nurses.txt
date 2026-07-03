@@ -1,0 +1,48 @@
+# Solver-free commit strategies: mus-hit (H1 pure) and mus-hit-learn (H1 + failure-learned
+# conflicts, sound B_full version). 5 seeds x 4 reps each, 240s/cell. Anchors in
+# strategy_analysis_80cell_*.txt (first/random/max-overlap/lookahead, same seeds/reps).
+== mus-hit ==
+RESULT mus-hit 48 1 TIMEOUT
+RESULT mus-hit 53 1 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=0s
+RESULT mus-hit 73 1 repaired q=33 c=8 r=19 b=6 mcs=285 mus=144 relax=5 t=3s
+RESULT mus-hit 82 1 repaired q=78 c=21 r=38 b=19 mcs=1436 mus=1085 relax=7 t=25s
+RESULT mus-hit 95 1 repaired q=114 c=28 r=59 b=27 mcs=1072 mus=769 relax=5 t=18s
+RESULT mus-hit 48 2 repaired q=92 c=22 r=50 b=20 mcs=4765 mus=3137 relax=6 t=159s
+RESULT mus-hit 53 2 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=0s
+RESULT mus-hit 73 2 repaired q=75 c=21 r=35 b=19 mcs=569 mus=375 relax=5 t=8s
+RESULT mus-hit 82 2 repaired q=48 c=12 r=27 b=9 mcs=293 mus=164 relax=7 t=3s
+RESULT mus-hit 95 2 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT mus-hit 48 3 TIMEOUT
+RESULT mus-hit 53 3 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT mus-hit 73 3 repaired q=64 c=18 r=29 b=17 mcs=862 mus=526 relax=5 t=12s
+RESULT mus-hit 82 3 repaired q=44 c=11 r=25 b=8 mcs=293 mus=164 relax=7 t=3s
+RESULT mus-hit 95 3 repaired q=179 c=46 r=88 b=45 mcs=1129 mus=625 relax=5 t=21s
+RESULT mus-hit 48 4 repaired q=75 c=16 r=45 b=14 mcs=872 mus=481 relax=6 t=10s
+RESULT mus-hit 53 4 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT mus-hit 73 4 repaired q=28 c=7 r=17 b=4 mcs=21 mus=26 relax=5 t=1s
+RESULT mus-hit 82 4 repaired q=87 c=23 r=42 b=22 mcs=1874 mus=1555 relax=7 t=38s
+RESULT mus-hit 95 4 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=0s
+== mus-hit-learn (corrected) ==
+RESULT mus-hit-learn 48 1 repaired q=38 c=7 r=26 b=5 mcs=842 mus=408 relax=6 t=6s
+RESULT mus-hit-learn 53 1 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=0s
+RESULT mus-hit-learn 73 1 repaired q=16 c=5 r=9 b=2 mcs=21 mus=26 relax=5 t=1s
+RESULT mus-hit-learn 82 1 repaired q=17 c=4 r=10 b=3 mcs=921 mus=514 relax=7 t=7s
+RESULT mus-hit-learn 95 1 repaired q=34 c=7 r=21 b=6 mcs=79 mus=92 relax=5 t=2s
+RESULT mus-hit-learn 48 2 repaired q=53 c=10 r=36 b=7 mcs=844 mus=460 relax=6 t=7s
+RESULT mus-hit-learn 53 2 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=0s
+RESULT mus-hit-learn 73 2 repaired q=21 c=6 r=11 b=4 mcs=285 mus=144 relax=5 t=2s
+RESULT mus-hit-learn 82 2 repaired q=26 c=6 r=17 b=3 mcs=292 mus=164 relax=7 t=2s
+RESULT mus-hit-learn 95 2 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=0s
+RESULT mus-hit-learn 48 3 repaired q=54 c=10 r=36 b=8 mcs=708 mus=364 relax=6 t=6s
+RESULT mus-hit-learn 53 3 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=0s
+RESULT mus-hit-learn 73 3 repaired q=16 c=5 r=9 b=2 mcs=21 mus=26 relax=5 t=1s
+RESULT mus-hit-learn 82 3 repaired q=20 c=6 r=11 b=3 mcs=285 mus=142 relax=7 t=2s
+RESULT mus-hit-learn 95 3 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=0s
+RESULT mus-hit-learn 48 4 repaired q=50 c=10 r=32 b=8 mcs=860 mus=447 relax=6 t=7s
+RESULT mus-hit-learn 53 4 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=0s
+RESULT mus-hit-learn 73 4 repaired q=16 c=5 r=9 b=2 mcs=21 mus=26 relax=5 t=1s
+RESULT mus-hit-learn 82 4 repaired q=19 c=4 r=12 b=3 mcs=1159 mus=700 relax=7 t=10s
+RESULT mus-hit-learn 95 4 repaired q=37 c=8 r=22 b=7 mcs=81 mus=91 relax=5 t=2s
+== per-commit dead rates ==
+/tmp/mushit.log: commits=245 dead_rate=0.86
+/tmp/mushitlearn2.log: commits=105 dead_rate=0.60

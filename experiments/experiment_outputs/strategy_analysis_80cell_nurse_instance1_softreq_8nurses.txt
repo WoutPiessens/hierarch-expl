@@ -1,0 +1,106 @@
+# 80-cell analysis (4 strategies x 5 seeds x 4 reps), fixed oracle (refine-translation), dedup blocking.
+# 8 cells timed out at 240s (solver variance, some CPU contention in reps 1-2); retries logged separately.
+=== per-strategy over all (seed, rep) runs ===
+    strategy   n  ok   queries mean±sd  median  backtr  |relax|
+       first  20  17      38.4±35.1      28.0    7.82     5.59
+      random  20  18      59.0±66.3      24.0   12.33     5.67
+ max-overlap  20  19      46.1±30.5      28.0    9.00     5.58
+   lookahead  20  18       7.7±2.1        7.5    0.00     5.61
+
+=== commit decisions: features of the CHOSEN option, and dead-end rate ===
+    strategy  #commits  dead rate  mean |M|  mean overlap  mean opts
+       first       170       0.78      3.55          5.96       1.87
+      random       262       0.85      3.46          5.87       2.79
+ max-overlap       216       0.79      3.50          5.94       1.94
+   lookahead        34       0.00      3.59          5.21       1.24
+
+=== dead-end rate by overlap (all strategies pooled; only decisions with >1 option) ===
+  overlap  3-4: dead rate 0.93  (n=86)
+  overlap  5-7: dead rate 0.84  (n=186)
+  overlap   8+: dead rate 0.97  (n=70)
+
+=== first vs random: when multiple options existed, what did they choose? ===
+    first: n= 84  mean overlap of chosen M = 5.54  dead rate = 0.86
+   random: n=151  mean overlap of chosen M = 5.93  dead rate = 0.90
+
+# raw RESULT lines:
+RESULT first 48 1 TIMEOUT
+RESULT first 53 1 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=1s
+RESULT first 73 1 repaired q=105 c=29 r=49 b=27 mcs=603 mus=404 relax=5 t=14s
+RESULT first 82 1 repaired q=56 c=14 r=31 b=11 mcs=276 mus=167 relax=7 t=5s
+RESULT first 95 1 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT random 48 1 repaired q=101 c=23 r=58 b=20 mcs=2138 mus=1359 relax=6 t=46s
+RESULT random 53 1 repaired q=19 c=4 r=13 b=2 mcs=16 mus=23 relax=5 t=1s
+RESULT random 73 1 repaired q=13 c=4 r=8 b=1 mcs=20 mus=24 relax=5 t=1s
+RESULT random 82 1 repaired q=24 c=7 r=13 b=4 mcs=286 mus=140 relax=7 t=3s
+RESULT random 95 1 repaired q=181 c=47 r=88 b=46 mcs=1628 mus=1075 relax=6 t=44s
+RESULT max-overlap 48 1 repaired q=89 c=20 r=52 b=17 mcs=2139 mus=1588 relax=6 t=56s
+RESULT max-overlap 53 1 repaired q=15 c=5 r=8 b=2 mcs=20 mus=24 relax=5 t=1s
+RESULT max-overlap 73 1 repaired q=28 c=7 r=17 b=4 mcs=22 mus=26 relax=5 t=1s
+RESULT max-overlap 82 1 repaired q=24 c=7 r=13 b=4 mcs=286 mus=140 relax=7 t=2s
+RESULT max-overlap 95 1 repaired q=25 c=6 r=15 b=4 mcs=35 mus=38 relax=5 t=1s
+RESULT lookahead 48 1 repaired q=10 c=2 r=8 b=0 mcs=824 mus=401 relax=6 t=8s
+RESULT lookahead 53 1 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT lookahead 73 1 repaired q=7 c=1 r=6 b=0 mcs=872 mus=512 relax=5 t=12s
+RESULT lookahead 82 1 repaired q=10 c=1 r=9 b=0 mcs=1901 mus=1479 relax=7 t=35s
+RESULT lookahead 95 1 repaired q=6 c=1 r=5 b=0 mcs=98 mus=78 relax=5 t=3s
+RESULT first 48 2 repaired q=84 c=19 r=49 b=16 mcs=848 mus=466 relax=6 t=12s
+RESULT first 53 2 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=1s
+RESULT first 73 2 repaired q=33 c=8 r=19 b=6 mcs=286 mus=144 relax=5 t=3s
+RESULT first 82 2 repaired q=85 c=22 r=42 b=21 mcs=1836 mus=1552 relax=7 t=43s
+RESULT first 95 2 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT random 48 2 TIMEOUT
+RESULT random 53 2 repaired q=12 c=4 r=7 b=1 mcs=19 mus=22 relax=5 t=1s
+RESULT random 73 2 repaired q=18 c=5 r=10 b=3 mcs=284 mus=142 relax=5 t=2s
+RESULT random 82 2 repaired q=38 c=11 r=18 b=9 mcs=1814 mus=1417 relax=7 t=32s
+RESULT random 95 2 TIMEOUT
+RESULT max-overlap 48 2 TIMEOUT
+RESULT max-overlap 53 2 repaired q=27 c=6 r=17 b=4 mcs=20 mus=36 relax=5 t=1s
+RESULT max-overlap 73 2 repaired q=28 c=7 r=17 b=4 mcs=22 mus=26 relax=5 t=1s
+RESULT max-overlap 82 2 repaired q=41 c=11 r=21 b=9 mcs=576 mus=361 relax=7 t=8s
+RESULT max-overlap 95 2 repaired q=22 c=5 r=14 b=3 mcs=35 mus=43 relax=5 t=1s
+RESULT lookahead 48 2 TIMEOUT
+RESULT lookahead 53 2 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT lookahead 73 2 repaired q=7 c=1 r=6 b=0 mcs=910 mus=502 relax=5 t=10s
+RESULT lookahead 82 2 repaired q=9 c=3 r=6 b=0 mcs=280 mus=135 relax=7 t=3s
+RESULT lookahead 95 2 TIMEOUT
+RESULT first 48 3 repaired q=84 c=20 r=46 b=18 mcs=1386 mus=656 relax=6 t=17s
+RESULT first 53 3 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=1s
+RESULT first 73 3 repaired q=28 c=7 r=17 b=4 mcs=21 mus=26 relax=5 t=1s
+RESULT first 82 3 repaired q=33 c=9 r=17 b=7 mcs=481 mus=261 relax=7 t=5s
+RESULT first 95 3 TIMEOUT
+RESULT random 48 3 repaired q=262 c=62 r=139 b=61 mcs=1080 mus=631 relax=6 t=23s
+RESULT random 53 3 repaired q=19 c=4 r=13 b=2 mcs=16 mus=23 relax=5 t=1s
+RESULT random 73 3 repaired q=13 c=4 r=8 b=1 mcs=20 mus=24 relax=5 t=1s
+RESULT random 82 3 repaired q=40 c=10 r=23 b=7 mcs=296 mus=165 relax=7 t=3s
+RESULT random 95 3 repaired q=102 c=25 r=53 b=24 mcs=1449 mus=1105 relax=5 t=25s
+RESULT max-overlap 48 3 repaired q=80 c=18 r=47 b=15 mcs=3028 mus=2276 relax=6 t=85s
+RESULT max-overlap 53 3 repaired q=27 c=6 r=17 b=4 mcs=20 mus=36 relax=5 t=1s
+RESULT max-overlap 73 3 repaired q=75 c=21 r=35 b=19 mcs=578 mus=373 relax=5 t=9s
+RESULT max-overlap 82 3 repaired q=53 c=14 r=26 b=13 mcs=1879 mus=1464 relax=7 t=39s
+RESULT max-overlap 95 3 repaired q=132 c=33 r=67 b=32 mcs=1099 mus=590 relax=5 t=18s
+RESULT lookahead 48 3 repaired q=11 c=1 r=10 b=0 mcs=1649 mus=1105 relax=6 t=31s
+RESULT lookahead 53 3 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=2s
+RESULT lookahead 73 3 repaired q=8 c=3 r=5 b=0 mcs=18 mus=18 relax=5 t=2s
+RESULT lookahead 82 3 repaired q=9 c=3 r=6 b=0 mcs=280 mus=135 relax=7 t=3s
+RESULT lookahead 95 3 repaired q=7 c=1 r=6 b=0 mcs=1418 mus=1056 relax=5 t=26s
+RESULT first 48 4 TIMEOUT
+RESULT first 53 4 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT first 73 4 repaired q=28 c=7 r=17 b=4 mcs=22 mus=26 relax=5 t=1s
+RESULT first 82 4 repaired q=81 c=21 r=41 b=19 mcs=1806 mus=1478 relax=7 t=35s
+RESULT first 95 4 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
+RESULT random 48 4 repaired q=74 c=16 r=44 b=14 mcs=709 mus=350 relax=6 t=8s
+RESULT random 53 4 repaired q=19 c=4 r=13 b=2 mcs=16 mus=23 relax=5 t=1s
+RESULT random 73 4 repaired q=13 c=4 r=8 b=1 mcs=20 mus=24 relax=5 t=1s
+RESULT random 82 4 repaired q=24 c=7 r=13 b=4 mcs=285 mus=142 relax=7 t=3s
+RESULT random 95 4 repaired q=90 c=21 r=49 b=20 mcs=333 mus=217 relax=5 t=6s
+RESULT max-overlap 48 4 repaired q=83 c=19 r=48 b=16 mcs=763 mus=348 relax=6 t=8s
+RESULT max-overlap 53 4 repaired q=27 c=6 r=17 b=4 mcs=20 mus=36 relax=5 t=1s
+RESULT max-overlap 73 4 repaired q=28 c=7 r=17 b=4 mcs=21 mus=26 relax=5 t=1s
+RESULT max-overlap 82 4 repaired q=48 c=12 r=27 b=9 mcs=293 mus=164 relax=7 t=4s
+RESULT max-overlap 95 4 repaired q=24 c=6 r=14 b=4 mcs=34 mus=41 relax=5 t=1s
+RESULT lookahead 48 4 repaired q=11 c=3 r=8 b=0 mcs=1983 mus=1266 relax=6 t=31s
+RESULT lookahead 53 4 repaired q=5 c=2 r=3 b=0 mcs=14 mus=16 relax=5 t=1s
+RESULT lookahead 73 4 repaired q=8 c=3 r=5 b=0 mcs=18 mus=18 relax=5 t=2s
+RESULT lookahead 82 4 repaired q=10 c=1 r=9 b=0 mcs=1902 mus=1480 relax=7 t=42s
+RESULT lookahead 95 4 repaired q=5 c=2 r=3 b=0 mcs=12 mus=15 relax=5 t=1s
