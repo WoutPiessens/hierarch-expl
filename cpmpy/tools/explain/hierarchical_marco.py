@@ -59,7 +59,8 @@ def _collect_candidates(groups):
 def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                         initial_level=1, return_mus=True, return_mcs=True, do_solution_hint=True,
                         round_timings=None, scripted_steps=None, log_events=None,
-                        core_per_round=False, lazy_map=True, decide_step=None):
+                        core_per_round=False, lazy_map=True, decide_step=None, deadline=None,
+                        round_cap=None):
     """
         MARCO-style enumeration of MUSes and MCSes over a hierarchy of constraint groups.
 
@@ -392,7 +393,7 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
         _bg_up = [up[i] for i in committed_background]
         _rel_down = [down[i] for i in committed_relaxed]
 
-        map_solver_inst += cp.any([down[id(node)] for node in groups])
+        map_solver_inst += cp.any([down[id(node)] for node in groups] + _rel_down)
         if do_solution_hint:
             hint = [1] * len(assump)
             map_solver_inst.solution_hint(assump, hint)
@@ -405,7 +406,17 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                                "frontier": [node.get_full_name() for node in groups]})
 
         _t_round_start = time.perf_counter()
+        _round_capped = False        # True iff this round stopped early due to round_cap
         while map_solver_inst.solve(assumptions=map_solver_assump):
+            if deadline is not None and time.perf_counter() > deadline:
+                break   # wall-clock budget hit mid-enumeration -- stop this round early
+            if round_cap is not None and len(round_results) >= round_cap:
+                # INTERACTIVE cap: don't exhaust the frontier's (possibly huge) conflict set
+                # before consulting the oracle -- present at most `round_cap` new results per
+                # round. Sound: all blocking clauses persist, so the remaining conflicts are
+                # simply found in LATER rounds instead of this one (deferred, never lost).
+                _round_capped = True
+                break
 
             # seeds may only contain active constraints that are not relaxed and not background
             seed = [a for a in free_assump if a.value()]
@@ -415,9 +426,15 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                 # SAT, grow to a full MSS -- only free (not relaxed, not background) constraints
                 # can be added, and the MCS is the complement over the free constraints.
                 mss = [a for a in free_assump if a.value() or dmap[a].get_grouped_constraint().value()]
+                _hit_deadline = False
                 for to_add in set(free_assump) - set(mss):
+                    if deadline is not None and time.perf_counter() > deadline:
+                        _hit_deadline = True           # grow loop can be O(|frontier|) solves --
+                        break                          # bound the overshoot to a single solve
                     if s.solve(assumptions=_expand(mss + [to_add]) + bg_core_assump) is True:
                         mss.append(to_add)
+                if _hit_deadline:
+                    break       # abandon this (partial) grow: add no block, yield nothing
                 mcs = [a for a in free_assump if a not in frozenset(mss)]
                 if not mcs:
                     # every free constraint is satisfiable alongside the background: the committed
@@ -436,7 +453,11 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                     # the conflict lies entirely in hard + background: no free constraint to
                     # blame, nothing free to enumerate this round.
                     break
+                _hit_deadline = False
                 for c in sorted(core, key=deletion_order.get):
+                    if deadline is not None and time.perf_counter() > deadline:
+                        _hit_deadline = True           # shrink loop is also O(|core|) solves
+                        break
                     if c not in core:
                         continue
                     core.remove(c)
@@ -444,6 +465,8 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                         core.add(c)
                     else:
                         core = {c for c in _core_to_groups(s.get_core()) if c in free_set}
+                if _hit_deadline:
+                    break       # abandon the partial shrink: add no block, yield nothing
 
                 # augmented with up of the background constraints: within the epoch these are
                 # true (ind forced on) so the block is exactly ~all(up[core]); outside it states
@@ -477,6 +500,27 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
         if round_timings is not None:
             round_timings.append({"round": round_idx, "seconds": time.perf_counter() - _t_round_start})
 
+        if deadline is not None and time.perf_counter() > deadline:
+            # let the driver observe this round's (partial) results once, then stop the sweep so
+            # the oracle can record a timeout instead of the enumerator spinning unbounded.
+            if decide_step is not None:
+                decide_step({
+                    "round": round_idx,
+                    "frontier": [nd.get_full_name() for nd in groups],
+                    "frontier_nodes": list(groups),
+                    "free": [nd.get_full_name() for nd in groups
+                             if id(nd) not in committed_relaxed and id(nd) not in committed_background],
+                    "refinable": [nd.get_full_name() for nd in groups if nd.children],
+                    "results": round_results,
+                    "capped": False,       # deadline stop: the driver must wrap up, not continue
+                    "committed_relaxed": [node_by_id[i].get_full_name() for i in committed_relaxed],
+                    "committed_background": [node_by_id[i].get_full_name() for i in committed_background],
+                    "state": {"groups": list(groups), "partitioned": set(partitioned),
+                              "committed_background": set(committed_background),
+                              "committed_relaxed": set(committed_relaxed)},
+                })
+            return
+
         if decide_step is not None:
             # interactive / programmatic driving: ask for the next refine-or-commit action.
             free_now = [nd for nd in groups
@@ -488,6 +532,8 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                 "free": [nd.get_full_name() for nd in free_now],
                 "refinable": [nd.get_full_name() for nd in groups if nd.children],
                 "results": round_results,
+                "capped": _round_capped,   # True: this round was cut short by round_cap, so the
+                                           # frontier has MORE conflicts -- 'continue' fetches them
                 "committed_relaxed": [node_by_id[i].get_full_name() for i in committed_relaxed],
                 "committed_background": [node_by_id[i].get_full_name() for i in committed_background],
                 # a snapshot sufficient to restore the map-solver assumptions on backtrack; the
@@ -499,6 +545,10 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
             })
             if not action or action.get("action") == "stop":
                 break
+            if action["action"] == "continue":
+                # same frontier, next round: the persistent blocks make the inner loop resume
+                # exactly where the cap stopped it, yielding the next `round_cap` conflicts.
+                continue
             if action["action"] == "restore":
                 # backtrack: restore a previously-snapshotted frontier / committed sets. The map
                 # solver keeps all its blocking clauses; those referencing now-inactive nodes are

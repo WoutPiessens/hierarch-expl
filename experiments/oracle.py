@@ -166,7 +166,7 @@ class RandomSampleOracle:
 
 
 def run_staged_deletion(soft, hard, soft_names, oracle, solver="exact", map_solver="exact",
-                        max_iterations=None, mcs_log=None):
+                        max_iterations=None, mcs_log=None, time_budget=None):
     """
         MCS-enumeration with *partial staging*: a variant of the MARCO loop (it reuses the same
         map-solver / core-solver machinery as `cpmpy.tools.explain.marco`) in which, instead of
@@ -223,6 +223,8 @@ def run_staged_deletion(soft, hard, soft_names, oracle, solver="exact", map_solv
     n_mcs = 0        # MCSes shown to the oracle == oracle decisions
     n_mus = 0
     n_solve_calls = 0
+    n_judgments = 0  # constraint-judgments = sum of |MCS| shown to the oracle
+    t_start = time.perf_counter()
 
     def active():
         return [a for i, a in enumerate(assump) if i not in relaxed]
@@ -236,17 +238,19 @@ def run_staged_deletion(soft, hard, soft_names, oracle, solver="exact", map_solv
         # all not-yet-deleted constraints enforced: is the relaxed problem now SAT?
         return core_solve(active()) is True
 
-    def result(reached_sat, capped=False):
-        return {"reached_sat": reached_sat, "capped": capped,
+    def result(reached_sat, capped=False, timed_out=False):
+        return {"reached_sat": reached_sat, "capped": capped, "timed_out": timed_out,
                 "relaxed_names": [soft_names[i] for i in sorted(relaxed)],
                 "n_relaxed": len(relaxed),
-                "n_mcs_enumerated": n_mcs, "n_mus_seen": n_mus,
+                "n_mcs_enumerated": n_mcs, "n_mus_seen": n_mus, "n_judgments": n_judgments,
                 "n_decisions": n_mcs, "n_solve_calls": n_solve_calls}
 
     if relaxed_is_sat():  # already SAT with nothing deleted (problem is normally UNSAT)
         return result(True)
 
     while ms.solve():
+        if time_budget is not None and time.perf_counter() - t_start >= time_budget:
+            return result(False, timed_out=True)
         seed = [a for a in assump if a.value() and idx_of[a] not in relaxed]
 
         if core_solve(seed) is True:
@@ -260,6 +264,7 @@ def run_staged_deletion(soft, hard, soft_names, oracle, solver="exact", map_solv
             mcs = [a for a in act if a not in frozenset(mss)]
             ms += cp.any(mcs)  # block this MCS so it is not enumerated again
             n_mcs += 1
+            n_judgments += len(mcs)
 
             # STAGING: the oracle deletes the suitable constraints inside this MCS.
             suitable = [a for a in mcs if oracle.is_suitable(name_of_a[a])]
@@ -292,7 +297,8 @@ def run_staged_deletion(soft, hard, soft_names, oracle, solver="exact", map_solv
     return result(False)  # map solver exhausted: no suitable correction subset exists
 
 
-def run_oracle(method_name, soft, hard, name_of, oracle, max_iterations=None, **method_kwargs):
+def run_oracle(method_name, soft, hard, name_of, oracle, max_iterations=None,
+               time_budget=None, judge_log=None, **method_kwargs):
     """
         Drive `METHODS[method_name]`'s enumerator and apply `oracle` to every MCS it proposes.
         MUSes are passed through (counted, not evaluated -- the oracle only judges MCSes, per
@@ -309,6 +315,8 @@ def run_oracle(method_name, soft, hard, name_of, oracle, max_iterations=None, **
     n_rejected = 0
     n_mus = 0
     n_mcs_seen = 0
+    n_judgments = 0            # total constraint-judgments = sum of |MCS| shown to the oracle
+    timed_out = False
 
     t0 = time.perf_counter()
     for kind, found in enumerate_fn(soft, hard, **method_kwargs):
@@ -317,6 +325,9 @@ def run_oracle(method_name, soft, hard, name_of, oracle, max_iterations=None, **
             continue
 
         n_mcs_seen += 1
+        n_judgments += len(found)
+        if judge_log is not None:
+            judge_log.append(len(found))
         names = frozenset(name_of[id(c)] for c in found)
         if oracle.evaluate(names):
             accepted = sorted(names)
@@ -324,6 +335,9 @@ def run_oracle(method_name, soft, hard, name_of, oracle, max_iterations=None, **
         n_rejected += 1
 
         if max_iterations is not None and n_mcs_seen >= max_iterations:
+            break
+        if time_budget is not None and time.perf_counter() - t0 >= time_budget:
+            timed_out = True
             break
     dt = time.perf_counter() - t0
 
@@ -333,6 +347,8 @@ def run_oracle(method_name, soft, hard, name_of, oracle, max_iterations=None, **
         "n_rejected": n_rejected,
         "n_mcs_seen": n_mcs_seen,
         "n_mus_seen": n_mus,
+        "n_judgments": n_judgments,
+        "timed_out": timed_out,
         "elapsed_seconds": dt,
         **oracle.stats(),
     }
@@ -453,7 +469,7 @@ class HierarchicalOracle:
     """
 
     def __init__(self, root, hard, S, seed=0, max_steps=5000, commit_strategy="first",
-                 log=None, verbose=False):
+                 log=None, verbose=False, time_budget=None, frontier_cap=None):
         self.S = frozenset(S)                                       # suitable primitive leaf names
         self._hard = list(hard)                                     # for the "already repaired?" test
         self._leaves = root.leaves()
@@ -463,6 +479,11 @@ class HierarchicalOracle:
         self.name2node = {nd.get_full_name(): nd for nd in root.iter_nodes()}
         self.rng = random.Random(seed)                             # only for random branch choice
         self.max_steps = max_steps
+        self.time_budget = time_budget           # wall-clock budget (s); set self.t0 before running
+        self.t0 = None
+        self.frontier_cap = frontier_cap         # if the open frontier exceeds this, refine is
+                                                 # forbidden and only commits (which shrink it) run
+        self.n_shrink_commit = 0                 # commits made purely to shrink an oversized frontier
         # Per-epoch registry of the group-MCSes / group-MUSes seen since the last commit (as
         # frozensets of group names). Within an epoch the background is fixed, so an MCS found in
         # an earlier round is still a valid state-relative GMCS while its members stay open. It is
@@ -477,6 +498,7 @@ class HierarchicalOracle:
         self.abandoned = set()                                     # (open-frontier signature, M) we backtracked from
         # metrics + outcome
         self.n_commit = self.n_refine = self.n_backtrack = self.n_steps = 0
+        self.n_continue = 0                                        # capped rounds continued (more conflicts requested)
         self.n_gmcs_seen = self.n_gmus_seen = 0
         self.n_relax_queries = 0                                   # total leaves relaxed by commits (1 query per relaxed constraint)
         self.n_lookahead_solves = 0                                # internal look-ahead SAT checks (not oracle queries)
@@ -502,14 +524,19 @@ class HierarchicalOracle:
         meet S (for a leaf this is just: the leaf itself is in S)."""
         return any(lf.get_full_name() in self.S for lf in self.name2node[name].leaves())
 
-    def _committable(self, M, open_names):
+    def _committable(self, M, open_names, loose=False):
         """A state-relative GMCS M is committable iff (a) all its members are still open, (b) it
         contains at least one primitive (leaf) member -- so committing relaxes something -- and
         (c) every member is potentially suitable. Because committing relaxes exactly the LEAF
         members of M, and a leaf is potentially suitable iff it is in S, (c) guarantees every
-        relaxed constraint is suitable."""
+        relaxed constraint is suitable.
+
+        `loose=True` (oversized-frontier mode) drops requirement (b): committing an all-internal
+        GMCS relaxes nothing yet, but it BACKGROUNDS every open group outside M -- shrinking the
+        frontier and narrowing the search to M's subtrees, which is the whole point of committing
+        when the frontier has grown too large to enumerate."""
         return (M <= open_names
-                and any(self._is_leaf(g) for g in M)
+                and (loose or any(self._is_leaf(g) for g in M))
                 and all(self._potentially_suitable(g) for g in M))
 
     def _suitable_leaves_under(self, name):
@@ -573,11 +600,24 @@ class HierarchicalOracle:
             self.result = "capped"
             self._log(ctx["round"], "stop", reason="capped")
             return {"action": "stop"}
+        if (self.time_budget is not None and self.t0 is not None
+                and time.perf_counter() - self.t0 >= self.time_budget):
+            self.result = "timeout"
+            self._log(ctx["round"], "stop", reason="timeout")
+            return {"action": "stop"}
+
+        # Oversized-frontier guard: enumerating group-MCSes over a huge open frontier is what
+        # blows the budget on many-MCS benchmarks. When the frontier exceeds `frontier_cap` we
+        # forbid refining (which only grows it) and commit a suitable GMCS -- which backgrounds
+        # every open group outside it, shrinking the frontier -- until it is back under the cap.
+        big = self.frontier_cap is not None and len(open_names) > self.frontier_cap
 
         # (1) COMMIT: pick a committable state-relative GMCS according to `commit_strategy`.
         options = [M for M in self.gmcs
-                   if (open_names, M) not in self.abandoned and self._committable(M, open_names)]
-        if self.commit_strategy in ("explore-after-fail", "explore-highest-after-fail") and self.cooldown:
+                   if (open_names, M) not in self.abandoned
+                   and self._committable(M, open_names, loose=big)]
+        if (self.commit_strategy in ("explore-after-fail", "explore-highest-after-fail")
+                and self.cooldown and not big):
             # cooldown after a dead end: skip the commit step entirely for one decision and
             # perform a RANDOM exploration step instead (any relevant, potentially-suitable
             # branch -- not necessarily the current one), so fresh conflict structure is
@@ -634,10 +674,19 @@ class HierarchicalOracle:
             def leafness(M):        # (all-leaf?, #suitable leaf members) -- pure-leaf MCSes can't dead-end
                 leaves = [g for g in M if self._is_leaf(g)]
                 return (len(leaves) == len(M), len(leaves))
-            if self.commit_strategy in ("first", "lookahead", "mus-hit", "mus-hit-learn",
-                                        "explore-after-fail", "explore-highest-after-fail"):
+            if big:
+                # oversized frontier: commit the SMALLEST suitable GMCS -- it backgrounds the most
+                # open groups, shrinking the frontier fastest. (Strategy choice is irrelevant here;
+                # the goal is purely to get back under the cap.)
+                M = min(options, key=len)
+                self.n_shrink_commit += 1
+            elif self.commit_strategy in ("first", "lookahead", "mus-hit",
+                                          "explore-highest-after-fail"):
                 M = options[0]
-            elif self.commit_strategy == "random":
+            elif self.commit_strategy in ("random", "explore-after-fail", "mus-hit-learn"):
+                # strategies 1/2/3 all share the same base rule: commit a RANDOM committable GMCS
+                # ("pick a random MCS if there are more"). They differ only in the extra mechanism
+                # (2: forced random explore after a backtrack; 3: reject learned-dead options).
                 M = self.rng.choice(options)
             elif self.commit_strategy == "pure-leaf":
                 # prefer MCSes made ONLY of suitable leaves (committing one relaxes a complete
@@ -686,6 +735,11 @@ class HierarchicalOracle:
                  and nm in relevant                                # relevant (appears in a GMCS/GMUS)
                  and self._potentially_suitable(nm)]               # potentially suitable
         branch = [c for c in cands if self._in_current_branch(c)]
+        if big:
+            # frontier over the cap: refining is forbidden (it would only grow it). We reach here
+            # only because no suitable GMCS was committable above, so fall through to backtrack --
+            # undo the refine that inflated the frontier and try a different branch.
+            pend = branch = cands = []
         if self.commit_strategy == "explore-after-fail" and self.cooldown and cands:
             pick, why = self.rng.choice(cands), "cooldown-random"  # forced random step after a dead end
             self.cooldown = 0
@@ -706,8 +760,12 @@ class HierarchicalOracle:
             pick, why = self.rng.choice(cands), "random-other-branch"  # jump to another open branch
         else:
             self.cooldown = 0    # nothing refinable: don't let the cooldown suppress commits forever
-            # Nothing to commit or refine. First: are we already repaired (the relaxed set is a
-            # correction set, with the remaining open groups jointly satisfiable)? If so, stop.
+            # Nothing to commit or refine in what we've seen. (Under an enumeration cap the frontier
+            # may hold more conflicts, but we act on the batch we have -- draining the rest just to
+            # look thrashed; if the batch offers no commit and no refinable relevant group, this
+            # frontier region is unproductive and we backtrack.)
+            # First: are we already repaired (the relaxed set is a correction set, with the
+            # remaining open groups jointly satisfiable)? If so, stop.
             if self._is_repaired(set(self.relaxed)):
                 self.result = "repaired"
                 self._log(ctx["round"], "stop", reason="repaired")
@@ -775,24 +833,38 @@ class HierarchicalOracle:
 
 
 def run_hierarchical_oracle(root, hard, S, seed=0, solver="exact", map_solver="exact",
-                            max_steps=5000, commit_strategy="first", log=None, verbose=False):
+                            max_steps=5000, commit_strategy="first", log=None, verbose=False,
+                            time_budget=None, round_cap=None, frontier_cap=None):
     """Drive `hierarchical_marco` with `HierarchicalOracle`, then verify the resulting relaxation
     is a genuine repair using only suitable constraints, and return the metrics."""
+    if log is None:
+        log = []
     oracle = HierarchicalOracle(root, hard, S, seed=seed, max_steps=max_steps,
-                                commit_strategy=commit_strategy, log=log, verbose=verbose)
-    for _ in hierarchical_marco(root, hard, solver=solver, map_solver=map_solver, decide_step=oracle):
+                                commit_strategy=commit_strategy, log=log, verbose=verbose,
+                                time_budget=time_budget, frontier_cap=frontier_cap)
+    oracle.t0 = time.perf_counter()
+    deadline = oracle.t0 + time_budget if time_budget is not None else None
+    for _ in hierarchical_marco(root, hard, solver=solver, map_solver=map_solver,
+                                decide_step=oracle, deadline=deadline, round_cap=round_cap):
         pass
     relaxed = set(oracle.relaxed)
     leaf_nodes = root.leaves()
     kept = [lf.get_grouped_constraint() for lf in leaf_nodes if lf.get_full_name() not in relaxed]
     repair_valid = cp.Model(hard + [c for c in kept if c is not None]).solve(solver="ortools") is True
+    if oracle.result is None:            # enumerator stopped on the deadline before the oracle did
+        oracle.result = "repaired" if repair_valid else "timeout"
+    # constraint-judgments: at each commit the oracle judges M's members (|M|); each refine is
+    # one exploration judgment. (Backtracks are undo bookkeeping, not oracle judgments.)
+    n_judgments = sum(len(e["mcs"]) for e in log if e["action"] == "commit") + oracle.n_refine
     return {
         "result": oracle.result,
         "relaxed": sorted(relaxed), "n_relaxed": len(relaxed),
         "relaxed_subset_of_S": relaxed <= set(S),
         "repair_valid": repair_valid,
         "n_commit": oracle.n_commit, "n_refine": oracle.n_refine, "n_backtrack": oracle.n_backtrack,
-        "n_decisions": oracle.n_commit + oracle.n_refine + oracle.n_backtrack,
+        "n_continue": oracle.n_continue, "n_shrink_commit": oracle.n_shrink_commit,
+        "n_judgments": n_judgments,
+        "n_decisions": oracle.n_commit + oracle.n_refine + oracle.n_backtrack + oracle.n_continue,
         # query count under "one constraint relaxed per query": each refine and each backtrack is
         # one query, and a commit relaxing k leaves counts as k queries (one per relaxation).
         "n_queries": oracle.n_refine + oracle.n_backtrack + oracle.n_relax_queries,

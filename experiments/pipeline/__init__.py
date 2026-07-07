@@ -24,6 +24,7 @@ from .algorithms import (
     umus_events,
     marco_events,
     hierarchical_marco_events,
+    map_incremental_marco_events,
     baseline_marco_events,
 )
 from .runner import ExperimentSpec, Series, run_experiment
@@ -31,6 +32,7 @@ from .runner import ExperimentSpec, Series, run_experiment
 __all__ = [
     "Instance", "transcript_instances", "synthetic_instances", "xcsp3_unsat_instances",
     "TRANSCRIPTS", "BENCHMARKS",
-    "umus_events", "marco_events", "hierarchical_marco_events", "baseline_marco_events",
+    "umus_events", "marco_events", "hierarchical_marco_events",
+    "map_incremental_marco_events", "baseline_marco_events",
     "ExperimentSpec", "Series", "run_experiment",
 ]

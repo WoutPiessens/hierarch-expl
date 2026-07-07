@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import time
 
-from cpmpy.tools.explain import marco, umus, hierarchical_marco
+from cpmpy.tools.explain import marco, umus, hierarchical_marco, map_incremental_marco
 from cpmpy.tools.explain.hierarchical_marco import _initial_cut
 from cpmpy.tools.explain.hierarchical import activate_descendants_at_level
 
@@ -95,15 +95,32 @@ def hierarchical_marco_events(instance, settings):
         (measured inside `hierarchical_marco` via its ``round_timings`` hook).
         ``elapsed_seconds`` is the cumulative enumeration time over the rounds so far.
     """
+    return _hier_events(hierarchical_marco, instance, settings)
+
+
+def map_incremental_marco_events(instance, settings):
+    """
+        One call to `map_incremental_marco` (only the MAP solver is persistent across rounds;
+        the core solver is rebuilt per round like the flat baseline). Same per-round
+        enumeration-time metric as :func:`hierarchical_marco_events`.
+    """
+    return _hier_events(map_incremental_marco, instance, settings)
+
+
+def _hier_events(fn, instance, settings):
+    """Shared driver for the single-call hierarchical enumerators (`fn` yields the same
+    tuples and accepts `round_timings`/`scripted_steps`/`log_events`/`lazy_map`)."""
     root, hard = instance.hierarchy()
     round_timings = []
-    for _ in hierarchical_marco(
+    for _ in fn(
             root, hard, solver=settings["solver"], map_solver=settings["map_solver"],
             initial_level=_initial_level(instance, settings),
             return_mus=settings.get("return_mus", True),
             return_mcs=settings.get("return_mcs", True),
             round_timings=round_timings,
-            scripted_steps=_scripted_steps(instance, settings)):
+            scripted_steps=_scripted_steps(instance, settings),
+            log_events=settings.get("_log_sink"),
+            lazy_map=settings.get("lazy_map", False)):
         pass
 
     events = []
@@ -123,13 +140,18 @@ def _marco_round_event(groups, hard, settings, round_idx, cumulative):
     """Run flat `marco` over `groups`, returning (event, appeared, round_seconds)."""
     soft = [g.get_grouped_constraint() for g in groups]
     group_of = {id(c): g for c, g in zip(soft, groups)}
+    log = settings.get("_log_sink")
+    if log is not None:
+        log.append({"type": "round", "round": round_idx,
+                    "frontier": [g.get_full_name() for g in groups]})
+    name_of = {id(c): g.get_full_name() for c, g in zip(soft, groups)} if log is not None else None
     appeared = set()
     enum_timing = []
     for kind, found in marco(soft, hard, solver=settings["solver"],
                              map_solver=settings["map_solver"],
                              return_mus=settings.get("return_mus", True),
                              return_mcs=settings.get("return_mcs", True),
-                             enum_timing=enum_timing):
+                             enum_timing=enum_timing, log_events=log, name_of=name_of):
         appeared.update(id(group_of[id(c)]) for c in found)
     round_seconds = enum_timing[0] if enum_timing else 0.0
     event = {

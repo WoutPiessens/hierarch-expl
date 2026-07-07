@@ -91,6 +91,54 @@ def _plot_instance(spec, instance_name, rows, plots_dir):
         )
 
 
+def _write_enumeration_log(path, spec, series_logs):
+    """
+        Write a chronological enumeration trace: for each (instance, series), the
+        map-solver seed and the MUS/MCS derived from it at every iteration, grouped by
+        refinement round (with that round's frontier of active groups).
+    """
+    lines = [
+        f"# Enumeration log: {spec.name}", "",
+        "Chronological trace of the MUS/MCS enumeration. For every map-solver iteration "
+        "the **seed** (the subset of active groups the map solver returned) is shown "
+        "together with the **MUS** or **MCS** derived from it. Iterations are grouped by "
+        "refinement round; each round header lists the round's frontier of active groups.",
+        "",
+    ]
+    by_inst = {}
+    for inst, series, records in series_logs:
+        by_inst.setdefault(inst, []).append((series, records))
+
+    for inst, series_list in by_inst.items():
+        lines.append(f"## Instance: {inst}")
+        lines.append("")
+        for series, records in series_list:
+            lines.append(f"### Series: {series}")
+            lines.append("")
+            it = n_mus = n_mcs = 0
+            for rec in records:
+                if rec["type"] == "round":
+                    front = rec["frontier"]
+                    lines.append("")
+                    lines.append(f"**Round {rec['round']}** — frontier ({len(front)} groups): "
+                                 + ", ".join(f"`{name}`" for name in front))
+                    lines.append("")
+                else:
+                    it += 1
+                    if rec["kind"] == "MUS":
+                        n_mus += 1
+                    else:
+                        n_mcs += 1
+                    seed = ", ".join(rec["seed"]) if rec["seed"] else "(empty)"
+                    result = ", ".join(rec["result"]) if rec["result"] else "(empty)"
+                    lines.append(f"- iter {it}: seed = {{{seed}}}  →  **{rec['kind']}** {{{result}}}")
+            lines.append("")
+            lines.append(f"_Totals for {series}: {n_mus} MUS, {n_mcs} MCS over {it} "
+                         f"map-solver iterations._")
+            lines.append("")
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
 def run_experiment(spec, output_dir, *, replot_only=False, skip=()):
     output_dir = Path(output_dir)
     plots_dir = output_dir / "plots"
@@ -110,15 +158,21 @@ def run_experiment(spec, output_dir, *, replot_only=False, skip=()):
 
     all_rows = []
     summary_rows = []
+    series_logs = []  # (instance, series, [log records]) for ENUMERATION_LOG.md
     for inst in spec.instances:
         print(f"[Load] {inst.name} <- {inst.source}", flush=True)
         srow = [inst.name, inst.describe()]
 
         for s in active_series:
             print(f"[{s.name}] {inst.name}", flush=True)
+            log_records = []
+            spec.settings["_log_sink"] = log_records
             t0 = time.perf_counter()
             events = s.fn(inst, spec.settings)
             elapsed = time.perf_counter() - t0
+            spec.settings.pop("_log_sink", None)
+            if log_records:
+                series_logs.append((inst.name, s.name, log_records))
             print(f"[{s.name}] {inst.name} done in {elapsed:.2f}s, {len(events)} events", flush=True)
 
             rows = events_to_rows(events, spec.name, inst.name, s.name, solver, map_solver)
@@ -165,6 +219,11 @@ def run_experiment(spec, output_dir, *, replot_only=False, skip=()):
             + table_md, encoding="utf-8")
         print(f"[Done] Per-round timing table written to {output_dir / 'ROUND_TIMES.md'}", flush=True)
         print("\n=== Per-round enumeration time (seconds) ===\n" + table_md, flush=True)
+
+    if series_logs:
+        log_path = output_dir / "ENUMERATION_LOG.md"
+        _write_enumeration_log(log_path, spec, series_logs)
+        print(f"[Done] Enumeration log written to {log_path}", flush=True)
 
     headline = "; ".join(
         f"{s.name}={summary_rows[0][2 + i * (3 if spec.has_rounds else 2)]}"

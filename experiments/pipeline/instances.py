@@ -63,10 +63,27 @@ class Instance:
 # ---------------------------------------------------------------------------
 
 # Hierarchical transcript benchmarks (exported from defense-rostering).
+# transcript_1..3 are curated interactive-driver snapshots (planned defenses pinned via
+# `already-allocated` + a few defenses to plan). transcript_4..7 are auto-generated from
+# defense-rostering's `input_data/instances_unsat/*` "plan all defenses in physical rooms"
+# (planned_defenses=[], defenses_to_plan=all): the explanation model has no virtual
+# "online" room, so a full physical schedule is UNSAT and is explained by the soft
+# person/room-unavailability constraints. See data/hierarchies/<t>_hierarchy/_manifest.json
+# for each one's source instance, defense split, and refinement scenario.
 TRANSCRIPTS = {
     "transcript_1": {"hierarchy_dir": "transcript_1_hierarchy", "initial_level": 1},
     "transcript_2": {"hierarchy_dir": "transcript_2_hierarchy", "initial_level": 1},
     "transcript_3": {"hierarchy_dir": "transcript_3_hierarchy", "initial_level": 1},
+    "transcript_4": {"hierarchy_dir": "transcript_4_hierarchy", "initial_level": 1},
+    "transcript_5": {"hierarchy_dir": "transcript_5_hierarchy", "initial_level": 1},
+    "transcript_6": {"hierarchy_dir": "transcript_6_hierarchy", "initial_level": 1},
+    "transcript_7": {"hierarchy_dir": "transcript_7_hierarchy", "initial_level": 1},
+    # anonymized copies of transcript_1..3 (person names -> pseudo-random ids); same pickle,
+    # only the person node labels differ. See experiments/anonymize_transcripts.py and the
+    # mapping in data/hierarchies/anonymization_mapping.json.
+    "transcript_1_anon": {"hierarchy_dir": "transcript_1_anon_hierarchy", "initial_level": 1},
+    "transcript_2_anon": {"hierarchy_dir": "transcript_2_anon_hierarchy", "initial_level": 1},
+    "transcript_3_anon": {"hierarchy_dir": "transcript_3_anon_hierarchy", "initial_level": 1},
 }
 
 # Synthetic graph-colouring benchmarks.
