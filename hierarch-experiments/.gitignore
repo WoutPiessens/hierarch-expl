@@ -1,0 +1,5 @@
+# generated experiment output
+results/
+# python caches
+__pycache__/
+*.pyc
