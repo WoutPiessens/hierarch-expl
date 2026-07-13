@@ -219,9 +219,12 @@ class HierarchCommitOracle:
         self.last_refined = None                 # tip of the current free branch (depth-first)
         self.stack = []                          # commit-backtrack snapshots (one per commit)
         self.abandoned = set()                   # (open-signature, M) we backtracked from
+        self.abandoned_mcs = set()               # M we backtracked from (signature-independent):
+                                                 # never re-commit the SAME group-MCS twice
         # outcome + metrics
-        self.n_commit = self.n_refine = self.n_backtrack = 0
+        self.n_commit = self.n_refine = self.n_backtrack = self.n_restart = 0
         self.judgments = 0
+        self._initial_state = None               # enumerator state at round 1 (for fresh restarts)
         self.result = None
         self.relaxed = []                        # final committed_relaxed (leaf names)
         self.background = set()                  # final committed_background (group names)
@@ -255,6 +258,24 @@ class HierarchCommitOracle:
             node = node.parent
         return False
 
+    # --- variant hooks (no-ops in the base policy; overridden by the variant subclasses) ---
+    def _pre_commit_action(self, ctx, open_names, rel):
+        """Chance to act BEFORE the commit/refine rules (forced explore, fresh restart, ...)."""
+        return None
+
+    def _alt_commit_action(self, ctx, open_names):
+        """Chance to commit under a WEAKER rule after the strict rule found no option."""
+        return None
+
+    def _ps_options(self, open_names):
+        """Group-MCSes that are *potentially suitable* (every member holds some S-leaf) and lie
+        entirely within the open frontier -- weaker than `_committable` (no leaf-member demand)."""
+        committed_active = {snap[-1] for snap in self.stack}
+        return [M for M in self.gmcs
+                if M <= open_names and M not in self.abandoned_mcs
+                and M not in committed_active and (open_names, M) not in self.abandoned
+                and all(self._potentially_suitable(g) for g in M)]
+
     # --- policy ---
     def __call__(self, ctx):
         for r in ctx["results"]:
@@ -268,6 +289,8 @@ class HierarchCommitOracle:
         open_names = frozenset(nd.get_full_name() for nd in ctx["frontier_nodes"]
                                if nd.get_full_name() not in rel and nd.get_full_name() not in bg)
         self.relaxed, self.background = list(rel), bg
+        if self._initial_state is None:
+            self._initial_state = ctx["state"]
 
         if (self.time_budget is not None and self.t0 is not None
                 and time.perf_counter() - self.t0 >= self.time_budget):
@@ -275,11 +298,28 @@ class HierarchCommitOracle:
         if not open_names:
             return self._stop("repaired" if self._is_repaired(rel) else "failed")
 
-        # (1) COMMIT a random committable group-MCS
+        # variant hook: forced exploration / fresh restart / ... (no-op in the base policy)
+        act = self._pre_commit_action(ctx, open_names, rel)
+        if act is not None:
+            return act
+
+        # (1) COMMIT a random committable group-MCS. Never commit the same MCS twice: skip any M
+        # already committed on the current branch (on the stack) or previously backtracked from
+        # (abandoned_mcs) -- the plain `abandoned` guard is signature-specific and would otherwise
+        # let an unrelated refine re-expose the same M for a redundant re-commit.
+        committed_active = {snap[-1] for snap in self.stack}
         options = [M for M in self.gmcs
-                   if (open_names, M) not in self.abandoned and self._committable(M, open_names)]
+                   if (open_names, M) not in self.abandoned
+                   and M not in self.abandoned_mcs
+                   and M not in committed_active
+                   and self._committable(M, open_names)]
         if options:
             return self._commit(ctx, self.rng.choice(options), open_names)
+
+        # variant hook: weaker commit rules (premature / random commit; no-op in the base policy)
+        act = self._alt_commit_action(ctx, open_names)
+        if act is not None:
+            return act
 
         # (2) REFINE toward a committable group-MCS
         relevant = set().union(*self.gmcs, *self.gmus) if (self.gmcs or self.gmus) else set()
@@ -338,6 +378,7 @@ class HierarchCommitOracle:
                 self.gmcs.append(fs)
         self.last_refined, self.pending = last_ref, pending
         self.abandoned.add((open_sig, M))                        # don't re-commit M at that state
+        self.abandoned_mcs.add(M)                                # ...nor the same M at any state
         self.n_backtrack += 1
         self.script.append({"action": "backtrack"})
         return {"action": "restore", "state": state}
@@ -348,8 +389,107 @@ class HierarchCommitOracle:
         return {"action": "stop"}
 
 
+# ------------------------------------------------------ hierarch-commit variants --------
+FRONTIER_CAP = 20              # random-commit: commit randomly once the open frontier exceeds this
+RESTART_STEPS = 100            # fresh-restart: restart after this many decisions w/o a NEW relaxation
+
+
+class HierarchExploreBacktrackOracle(HierarchCommitOracle):
+    """hierarch-commit + EXPLORE ON BACKTRACK: the moment a commit is backtracked, the next action
+    must be a random exploration (refine) of a constraint group that occurs together, in some
+    registered group-MCS, with a primitive constraint the just-backtracked commit had relaxed."""
+
+    def __init__(self, root, hard, S, seed=0, time_budget=None):
+        super().__init__(root, hard, S, seed=seed, time_budget=time_budget)
+        self._explore_seed = None                # leaves relaxed by the commit just backtracked
+
+    def _commit_backtrack(self, ctx):
+        M = self.stack[-1][-1]
+        act = super()._commit_backtrack(ctx)
+        self._explore_seed = frozenset(g for g in M if self._is_leaf(g))
+        return act
+
+    def _pre_commit_action(self, ctx, open_names, rel):
+        if not self._explore_seed:
+            return None
+        seed_leaves, self._explore_seed = self._explore_seed, None
+        cands = sorted({g for fs in self.gmcs if fs & seed_leaves for g in fs
+                        if g in open_names and not self._is_leaf(g)
+                        and self.name2node[g].children and self._potentially_suitable(g)})
+        if not cands:
+            return None                          # nothing refinable co-occurs: fall through
+        return self._refine(ctx, self.rng.choice(cands))
+
+
+class HierarchPrematureCommitOracle(HierarchCommitOracle):
+    """hierarch-commit + PREMATURE COMMIT: every round (i.e. after every exploration step), check
+    ALL registered group-MCSes; if exactly ONE is potentially suitable -- no other option -- commit
+    it, even when it is not yet strictly committable (e.g. it still contains non-leaf groups)."""
+
+    def _alt_commit_action(self, ctx, open_names):
+        ps = self._ps_options(open_names)
+        if len(ps) == 1:
+            return self._commit(ctx, ps[0], open_names)
+        return None
+
+
+class HierarchRandomCommitOracle(HierarchCommitOracle):
+    """hierarch-commit + RANDOM COMMIT: once the open frontier grows beyond FRONTIER_CAP groups,
+    commit a RANDOM potentially-suitable group-MCS (even if there are several, and even if none is
+    strictly committable) to cut the frontier back down."""
+
+    def _alt_commit_action(self, ctx, open_names):
+        if len(open_names) <= FRONTIER_CAP:
+            return None
+        ps = self._ps_options(open_names)
+        if not ps:
+            return None
+        return self._commit(ctx, self.rng.choice(ps), open_names)
+
+
+class HierarchFreshRestartOracle(HierarchCommitOracle):
+    """hierarch-commit + RANDOM FRESH RESTART: if more than RESTART_STEPS decisions pass without
+    relaxing a NEW constraint (never relaxed before at ANY point of the run), restore the initial
+    abstraction level and start over. Choices are TRULY random (SystemRandom -- the seed argument
+    is ignored) so a restart can actually take a different path. The per-attempt duplicate-commit
+    guards are cleared on restart: a fresh attempt may re-commit an MCS an earlier attempt
+    abandoned (within one attempt the same MCS is still never committed twice)."""
+
+    def __init__(self, root, hard, S, seed=0, time_budget=None):
+        super().__init__(root, hard, S, seed=seed, time_budget=time_budget)
+        self.rng = random.SystemRandom()         # truly random: restarts must be able to diverge
+        self._ever_relaxed = set()
+        self._steps_since_new = 0
+
+    def _restart(self):
+        self.gmcs, self.gmus = [], []
+        self.pending, self.last_refined, self.stack = [], None, []
+        self.abandoned, self.abandoned_mcs = set(), set()
+        self._steps_since_new = 0
+        self.n_restart += 1
+        self.script.append({"action": "restart"})
+        return {"action": "restore", "state": self._initial_state}
+
+    def _pre_commit_action(self, ctx, open_names, rel):
+        new = rel - self._ever_relaxed
+        if new:
+            self._ever_relaxed |= new
+            self._steps_since_new = 0
+        else:
+            self._steps_since_new += 1
+        if self._steps_since_new > RESTART_STEPS:
+            return self._restart()
+        return None
+
+    def _stop(self, reason):
+        # a failed dead-end is not final for this variant: restart until the budget ends the run
+        if reason == "failed" and self._initial_state is not None:
+            return self._restart()
+        return super()._stop(reason)
+
+
 def run_hierarch_commit(root, hard, S, seed=0, time_budget=600.0, round_cap=ROUND_CAP,
-                        method="hierarch-commit"):
+                        method="hierarch-commit", oracle_cls=HierarchCommitOracle):
     """Drive ``hierarchical_marco`` with :class:`HierarchCommitOracle` (no frontier bound, no
     explore-backtrack), verify the resulting relaxation, and return the metrics.
 
@@ -360,7 +500,7 @@ def run_hierarch_commit(root, hard, S, seed=0, time_budget=600.0, round_cap=ROUN
           * ``hierarch-commit-nocap`` -- round_cap=None: EVERY group MUS/MCS of the current frontier
                                           is enumerated before the oracle decides.
     """
-    oracle = HierarchCommitOracle(root, hard, S, seed=seed, time_budget=time_budget)
+    oracle = oracle_cls(root, hard, S, seed=seed, time_budget=time_budget)
     oracle.t0 = time.perf_counter()
     deadline = oracle.t0 + time_budget if time_budget is not None else None
     for _ in hierarchical_marco(root, list(hard), solver=SOLVER, map_solver=MAP_SOLVER,
@@ -373,7 +513,7 @@ def run_hierarch_commit(root, hard, S, seed=0, time_budget=600.0, round_cap=ROUN
         oracle.result = "repaired" if repaired else "timeout"
     # pruned primitives = number of leaf constraints inside the final background (pruned) groups
     pruned = sum(len(oracle.name2node[g].leaves()) for g in oracle.background)
-    decisions = oracle.n_commit + oracle.n_refine + oracle.n_backtrack
+    decisions = oracle.n_commit + oracle.n_refine + oracle.n_backtrack + oracle.n_restart
     return _metrics(method, decisions=decisions, judgments=oracle.judgments,
                     relaxed=len(relaxed), pruned=pruned, commits=oracle.n_commit,
                     backtracks=oracle.n_backtrack, timed_out=(oracle.result == "timeout"),
@@ -387,9 +527,37 @@ def run_hierarch_commit_nocap(root, hard, S, seed=0, time_budget=600.0):
                                round_cap=None, method="hierarch-commit-nocap")
 
 
+def run_explore_backtrack(root, hard, S, seed=0, time_budget=600.0):
+    return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                               oracle_cls=HierarchExploreBacktrackOracle,
+                               method="hierarch-explore-backtrack")
+
+
+def run_premature_commit(root, hard, S, seed=0, time_budget=600.0):
+    return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                               oracle_cls=HierarchPrematureCommitOracle,
+                               method="hierarch-premature-commit")
+
+
+def run_random_commit(root, hard, S, seed=0, time_budget=600.0):
+    return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                               oracle_cls=HierarchRandomCommitOracle,
+                               method="hierarch-random-commit")
+
+
+def run_fresh_restart(root, hard, S, seed=0, time_budget=600.0):
+    return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                               oracle_cls=HierarchFreshRestartOracle,
+                               method="hierarch-fresh-restart")
+
+
 METHODS = {
     "mcs-enumeration": run_baseline,
     "selective-relaxation": run_selective_relaxation,
     "hierarch-commit": run_hierarch_commit,                  # per-round cap of 20 conflicts
     "hierarch-commit-nocap": run_hierarch_commit_nocap,      # no cap: enumerate ALL conflicts / round
+    "hierarch-explore-backtrack": run_explore_backtrack,     # random co-occurring explore on backtrack
+    "hierarch-premature-commit": run_premature_commit,       # commit when it is the ONLY ps option
+    "hierarch-random-commit": run_random_commit,             # random ps commit once frontier > 20
+    "hierarch-fresh-restart": run_fresh_restart,             # truly-random restart after 100 stale steps
 }

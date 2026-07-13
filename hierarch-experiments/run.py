@@ -52,7 +52,7 @@ def run_cell(problem, instance, scheme, seed, method, budget):
     root, hard = hierarchy.load_instance(problem, instance)
     oracle = next(o for o in orc.load_oracles(problem, instance, scheme) if o["seed"] == seed)
     S = set(oracle["S"])
-    if method.startswith("hierarch-commit"):                 # capped + nocap variants take a seed
+    if method.startswith("hierarch"):                        # every hierarch-* variant takes a seed
         m = METHODS[method](root, hard, S, seed=seed, time_budget=budget)
     else:
         m = METHODS[method](root, hard, S, time_budget=budget)
@@ -129,7 +129,9 @@ def main():
     ap.add_argument("--schemes", nargs="+", default=list(orc.SCHEMES.keys()))
     ap.add_argument("--methods", nargs="+",
                     default=["mcs-enumeration", "selective-relaxation",
-                             "hierarch-commit", "hierarch-commit-nocap"])
+                             "hierarch-commit", "hierarch-commit-nocap",
+                             "hierarch-explore-backtrack", "hierarch-premature-commit",
+                             "hierarch-random-commit", "hierarch-fresh-restart"])
     ap.add_argument("--budget", type=float, default=BUDGET)
     ap.add_argument("--list", action="store_true", help="print the cells that would run and exit")
     ap.add_argument("--cell", nargs=6, metavar=("PROBLEM", "INSTANCE", "SCHEME", "SEED", "METHOD",
