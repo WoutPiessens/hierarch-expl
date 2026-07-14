@@ -491,10 +491,13 @@ class HierarchFreshRestartOracle(HierarchCommitOracle):
 
 
 class HierarchStepBacktrackOracle(HierarchCommitOracle):
-    """hierarch-commit + PER-BRANCH STEP CAP: if BRANCH_STEP_CAP decisions pass inside the current
-    branch without another commit, the branch is presumed stuck -- force-backtrack ONE level (keep
-    the commit stack and everything learned; this is NOT a restart). The counter resets on every
-    commit and backtrack."""
+    """hierarch-commit + PER-BRANCH STEP CAP: if CAP decisions pass inside the current branch
+    without another commit, the branch is presumed stuck -- force-backtrack ONE level (keep the
+    commit stack and everything learned; this is NOT a restart). The counter resets on every
+    commit and backtrack. Override CAP (class attribute) for other bounds -- see
+    ``make_step_backtrack``."""
+
+    CAP = BRANCH_STEP_CAP
 
     def __init__(self, root, hard, S, seed=0, time_budget=None):
         super().__init__(root, hard, S, seed=seed, time_budget=time_budget)
@@ -510,7 +513,7 @@ class HierarchStepBacktrackOracle(HierarchCommitOracle):
 
     def _pre_commit_action(self, ctx, open_names, rel):
         self._branch_steps += 1
-        if self._branch_steps > BRANCH_STEP_CAP and self.stack:
+        if self._branch_steps > type(self).CAP and self.stack:
             return self._commit_backtrack(ctx)
         return None
 
@@ -637,3 +640,20 @@ METHODS = {
     "hierarch-step-backtrack": run_step_backtrack,           # force backtrack after 50 stale branch steps
     "hierarch-step-backtrack-nocap": run_step_backtrack_nocap,
 }
+
+
+def make_step_backtrack(cap):
+    """Runner for a step-backtrack variant with branch-step cap `cap` (method name carries the
+    bound, e.g. ``hierarch-step-backtrack-ub100``)."""
+    cls = type(f"HierarchStepBacktrackOracleUb{cap}", (HierarchStepBacktrackOracle,),
+               {"CAP": cap})
+
+    def runner(root, hard, S, seed=0, time_budget=600.0):
+        return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                                   oracle_cls=cls, method=f"hierarch-step-backtrack-ub{cap}")
+    return runner
+
+
+# cap-sweep variants (ub50 is the plain hierarch-step-backtrack above)
+for _cap in (10, 20, 100, 200, 500):
+    METHODS[f"hierarch-step-backtrack-ub{_cap}"] = make_step_backtrack(_cap)
