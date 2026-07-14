@@ -159,8 +159,12 @@ def main():
         p, i, s, seed = c
         cmd = [sys.executable, str(HERE / "runtime_premature.py"), "--cell",
                p, i, s, str(seed), str(args.budget)]
-        out = subprocess.run(cmd, cwd=str(HERE), capture_output=True, text=True,
-                             timeout=3 * args.budget + 300)
+        try:
+            out = subprocess.run(cmd, cwd=str(HERE), capture_output=True, text=True,
+                                 timeout=3 * args.budget + 300)
+        except subprocess.TimeoutExpired:
+            return {"problem": p, "instance": i, "scheme": s, "seed": seed,
+                    "error": True, "timed_out_hard": True}
         for line in out.stdout.splitlines():
             if line.startswith("RESULT "):
                 return json.loads(line[len("RESULT "):])
