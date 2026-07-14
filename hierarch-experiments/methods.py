@@ -392,6 +392,8 @@ class HierarchCommitOracle:
 # ------------------------------------------------------ hierarch-commit variants --------
 FRONTIER_CAP = 20              # random-commit: commit randomly once the open frontier exceeds this
 RESTART_STEPS = 100            # fresh-restart: restart after this many decisions w/o a NEW relaxation
+BRANCH_STEP_CAP = 50           # step-backtrack: force-backtrack a branch after this many decisions
+                               # without a commit (~30s at the measured median 0.61 s/decision)
 
 
 class HierarchExploreBacktrackOracle(HierarchCommitOracle):
@@ -488,6 +490,31 @@ class HierarchFreshRestartOracle(HierarchCommitOracle):
         return super()._stop(reason)
 
 
+class HierarchStepBacktrackOracle(HierarchCommitOracle):
+    """hierarch-commit + PER-BRANCH STEP CAP: if BRANCH_STEP_CAP decisions pass inside the current
+    branch without another commit, the branch is presumed stuck -- force-backtrack ONE level (keep
+    the commit stack and everything learned; this is NOT a restart). The counter resets on every
+    commit and backtrack."""
+
+    def __init__(self, root, hard, S, seed=0, time_budget=None):
+        super().__init__(root, hard, S, seed=seed, time_budget=time_budget)
+        self._branch_steps = 0
+
+    def _commit(self, ctx, M, open_names):
+        self._branch_steps = 0
+        return super()._commit(ctx, M, open_names)
+
+    def _commit_backtrack(self, ctx):
+        self._branch_steps = 0
+        return super()._commit_backtrack(ctx)
+
+    def _pre_commit_action(self, ctx, open_names, rel):
+        self._branch_steps += 1
+        if self._branch_steps > BRANCH_STEP_CAP and self.stack:
+            return self._commit_backtrack(ctx)
+        return None
+
+
 def run_hierarch_commit(root, hard, S, seed=0, time_budget=600.0, round_cap=ROUND_CAP,
                         method="hierarch-commit", oracle_cls=HierarchCommitOracle):
     """Drive ``hierarchical_marco`` with :class:`HierarchCommitOracle` (no frontier bound, no
@@ -551,6 +578,51 @@ def run_fresh_restart(root, hard, S, seed=0, time_budget=600.0):
                                method="hierarch-fresh-restart")
 
 
+def run_portfolio(root, hard, S, seed=0, time_budget=600.0, round_cap=ROUND_CAP,
+                  method="hierarch-portfolio"):
+    """PORTFOLIO of the three complementary commit rules (base / premature / random -- overlap
+    analysis: Jaccard 0.22-0.37, over half of the solved cells solved by exactly one of them).
+    Run them SEQUENTIALLY, each on an equal share of the budget, stopping at the first repair.
+    decisions/judgments/commits/backtracks are summed over the attempts (total oracle effort);
+    relaxed/pruned come from the successful attempt (else the last one)."""
+    t0 = time.perf_counter()
+    share = time_budget / 3
+    tot = {"decisions": 0, "judgments": 0, "commits": 0, "backtracks": 0}
+    m = None
+    for cls in (HierarchCommitOracle, HierarchPrematureCommitOracle,
+                HierarchRandomCommitOracle):
+        m = run_hierarch_commit(root, hard, S, seed=seed, time_budget=share,
+                                round_cap=round_cap, method=method, oracle_cls=cls)
+        for k in tot:
+            tot[k] += m[k] or 0
+        if m["repaired"]:
+            break
+    elapsed = time.perf_counter() - t0
+    return _metrics(method, decisions=tot["decisions"], judgments=tot["judgments"],
+                    relaxed=m["relaxed"], pruned=m["pruned"],
+                    commits=tot["commits"], backtracks=tot["backtracks"],
+                    timed_out=(not m["repaired"]) and elapsed >= 0.95 * time_budget,
+                    elapsed=elapsed, repaired=m["repaired"])
+
+
+def run_portfolio_nocap(root, hard, S, seed=0, time_budget=600.0):
+    """`hierarch-portfolio` with NO round cap in the constituent runs."""
+    return run_portfolio(root, hard, S, seed=seed, time_budget=time_budget,
+                         round_cap=None, method="hierarch-portfolio-nocap")
+
+
+def run_step_backtrack(root, hard, S, seed=0, time_budget=600.0):
+    return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                               oracle_cls=HierarchStepBacktrackOracle,
+                               method="hierarch-step-backtrack")
+
+
+def run_step_backtrack_nocap(root, hard, S, seed=0, time_budget=600.0):
+    return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                               round_cap=None, oracle_cls=HierarchStepBacktrackOracle,
+                               method="hierarch-step-backtrack-nocap")
+
+
 METHODS = {
     "mcs-enumeration": run_baseline,
     "selective-relaxation": run_selective_relaxation,
@@ -560,4 +632,8 @@ METHODS = {
     "hierarch-premature-commit": run_premature_commit,       # commit when it is the ONLY ps option
     "hierarch-random-commit": run_random_commit,             # random ps commit once frontier > 20
     "hierarch-fresh-restart": run_fresh_restart,             # truly-random restart after 100 stale steps
+    "hierarch-portfolio": run_portfolio,                     # base -> premature -> random, budget/3 each
+    "hierarch-portfolio-nocap": run_portfolio_nocap,         # portfolio with no round cap
+    "hierarch-step-backtrack": run_step_backtrack,           # force backtrack after 50 stale branch steps
+    "hierarch-step-backtrack-nocap": run_step_backtrack_nocap,
 }

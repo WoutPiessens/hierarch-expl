@@ -30,7 +30,9 @@ def main():
                     default=["mcs-enumeration", "selective-relaxation",
                              "hierarch-commit", "hierarch-commit-nocap",
                              "hierarch-explore-backtrack", "hierarch-premature-commit",
-                             "hierarch-random-commit", "hierarch-fresh-restart"])
+                             "hierarch-random-commit", "hierarch-fresh-restart",
+                             "hierarch-portfolio", "hierarch-portfolio-nocap",
+                             "hierarch-step-backtrack", "hierarch-step-backtrack-nocap"])
     ap.add_argument("--budget", type=float, default=run.BUDGET)
     ap.add_argument("--workers", type=int, default=4)
     args = ap.parse_args()

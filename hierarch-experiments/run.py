@@ -131,7 +131,9 @@ def main():
                     default=["mcs-enumeration", "selective-relaxation",
                              "hierarch-commit", "hierarch-commit-nocap",
                              "hierarch-explore-backtrack", "hierarch-premature-commit",
-                             "hierarch-random-commit", "hierarch-fresh-restart"])
+                             "hierarch-random-commit", "hierarch-fresh-restart",
+                             "hierarch-portfolio", "hierarch-portfolio-nocap",
+                             "hierarch-step-backtrack", "hierarch-step-backtrack-nocap"])
     ap.add_argument("--budget", type=float, default=BUDGET)
     ap.add_argument("--list", action="store_true", help="print the cells that would run and exit")
     ap.add_argument("--cell", nargs=6, metavar=("PROBLEM", "INSTANCE", "SCHEME", "SEED", "METHOD",
