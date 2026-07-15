@@ -1,0 +1,5 @@
+{
+  "problem": "nurse-hier2",
+  "instance": "instance2",
+  "source": "nurse/instance2 regrouped: family->week->day->nurse"
+}
