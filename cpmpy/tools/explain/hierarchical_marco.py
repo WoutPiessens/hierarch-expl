@@ -328,6 +328,16 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
     committed_relaxed = set()     # ids: primitive leaf constraints relaxed via a commit
     round_idx = 0
 
+    # Per-STATE conflict cache. A state (= abstraction level) is characterized by the four
+    # assumption-variable sets asserted each round: act(groups), part(partitioned),
+    # relaxed(committed_relaxed) and background(committed_background). The map solver is never
+    # rewound on restore -- only these assumptions change -- and everything found at a state is
+    # remembered here so that (a) backtracking to a state RE-SHOWS its known MUS/MCSes to the
+    # oracle (tagged ``"cached": True``) instead of relying on re-derivation, and (b) a conflict
+    # re-derived at a state it was already shown in is NOT shown again (state-level no-repeat).
+    state_cache = {}          # state_key -> list of {"kind": ..., "names": [...]} in found order
+    just_restored = False     # True right after a restore: re-show the target state's cache
+
     # for scripted refinement: resolve a group's full name to its node
     name_to_node = {node.get_full_name(): node for node in candidates}
 
@@ -377,6 +387,15 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
         map_solver_assump = ([part[i] for i in partitioned] + [act[id(node)] for node in groups]
                              + [background[i] for i in committed_background]
                              + [relaxed[i] for i in committed_relaxed] + pins)
+
+        # state key = the assumption signature asserted this round (act/part/relaxed/background)
+        state_key = (frozenset(id(node) for node in groups), frozenset(partitioned),
+                     frozenset(committed_relaxed), frozenset(committed_background))
+        state_known = state_cache.setdefault(state_key, [])
+        known_keys = {(r["kind"], frozenset(r["names"])) for r in state_known}
+        # after a backtrack, re-show this state's previously found conflicts to the oracle
+        cached_results = ([dict(r, cached=True) for r in state_known] if just_restored else [])
+        just_restored = False
 
         # Blocking clauses recorded while commits are active are made sound across states by
         # augmenting them with the SEMANTIC vars of the committed nodes (no assumption vars):
@@ -482,8 +501,16 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
             found_nodes = [dmap[a] for a in found]
             appeared.update(id(node) for node in found_nodes)
             if found_nodes:
-                round_results.append({"kind": kind,
-                                      "names": [node.get_full_name() for node in found_nodes]})
+                rec = {"kind": kind, "names": [node.get_full_name() for node in found_nodes]}
+                rkey = (kind, frozenset(rec["names"]))
+                if rkey not in known_keys:
+                    # new to THIS state: remember it and show it. A re-derivation of a conflict
+                    # already shown at this state (possible after backtracks, since inner-epoch
+                    # blocking clauses are augmented to be inert outside their epoch) is blocked
+                    # again above but NOT re-shown to the oracle.
+                    known_keys.add(rkey)
+                    state_known.append(rec)
+                    round_results.append(rec)
 
             if log_events is not None:
                 log_events.append({"type": "iter", "seed": seed_names, "kind": kind,
@@ -511,7 +538,7 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                     "free": [nd.get_full_name() for nd in groups
                              if id(nd) not in committed_relaxed and id(nd) not in committed_background],
                     "refinable": [nd.get_full_name() for nd in groups if nd.children],
-                    "results": round_results,
+                    "results": cached_results + round_results,
                     "capped": False,       # deadline stop: the driver must wrap up, not continue
                     "committed_relaxed": [node_by_id[i].get_full_name() for i in committed_relaxed],
                     "committed_background": [node_by_id[i].get_full_name() for i in committed_background],
@@ -531,7 +558,7 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                 "frontier_nodes": list(groups),
                 "free": [nd.get_full_name() for nd in free_now],
                 "refinable": [nd.get_full_name() for nd in groups if nd.children],
-                "results": round_results,
+                "results": cached_results + round_results,
                 "capped": _round_capped,   # True: this round was cut short by round_cap, so the
                                            # frontier has MORE conflicts -- 'continue' fetches them
                 "committed_relaxed": [node_by_id[i].get_full_name() for i in committed_relaxed],
@@ -559,6 +586,7 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                 partitioned.clear(); partitioned.update(st["partitioned"])
                 committed_background.clear(); committed_background.update(st["committed_background"])
                 committed_relaxed.clear(); committed_relaxed.update(st["committed_relaxed"])
+                just_restored = True   # next round: re-show the restored state's cached conflicts
                 continue
             if action["action"] == "commit":
                 mcs_ids = {id(name_to_node[nm]) for nm in action["mcs"]}

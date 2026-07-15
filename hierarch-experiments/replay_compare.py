@@ -76,11 +76,15 @@ class VerifyingDecider:
 
     def __call__(self, ctx):
         now = time.perf_counter()
-        found = [(r["kind"], frozenset(r["names"])) for r in ctx["results"]]
+        found = [(r["kind"], frozenset(r["names"])) for r in ctx["results"]
+                 if not r.get("cached")]
+        cached = [(r["kind"], frozenset(r["names"])) for r in ctx["results"]
+                  if r.get("cached")]
         rel, bg = set(ctx["committed_relaxed"]), set(ctx["committed_background"])
         frontier = {nd.get_full_name() for nd in ctx["frontier_nodes"]
                     if nd.get_full_name() not in rel and nd.get_full_name() not in bg}
-        self.rounds.append({"frontier": frontier, "found": found,
+        self.rounds.append({"frontier": frontier, "found": found, "cached": cached,
+                            "state": (frozenset(frontier), frozenset(rel), frozenset(bg)),
                             "seconds": (now - self.tprev) if self.tprev else 0.0})
         self.tprev = time.perf_counter()
         step = self.script[self.i] if self.i < len(self.script) else {"action": "stop"}
@@ -97,18 +101,18 @@ class VerifyingDecider:
         return {"action": "stop"}
 
 
-def replay_incremental(root, hard, script, budget):
+def replay_incremental(root, hard, script, budget, cap=None):
     dec = VerifyingDecider(script)
     t0 = time.perf_counter()
     dec.tprev = t0
     for _ in hierarchical_marco(root, list(hard), solver=SOLVER, map_solver=MAP_SOLVER,
-                                decide_step=dec, deadline=t0 + budget, round_cap=None):
+                                decide_step=dec, deadline=t0 + budget, round_cap=cap):
         pass
     return time.perf_counter() - t0, dec.i >= len(dec.script), dec.rounds
 
 
 # ---------------------------------------------------------------------- base ---
-def replay_base(root, hard, script, budget):
+def replay_base(root, hard, script, budget, cap=None):
     name2node = {nd.get_full_name(): nd for nd in root.iter_nodes()}
     st = {"frontier": [c.get_full_name() for c in root.children],
           "pruned": set(), "relaxed": set(), "stack": []}
@@ -131,6 +135,8 @@ def replay_base(root, hard, script, budget):
             for kind, cons in marco(soft, hard_now, solver=SOLVER, map_solver=MAP_SOLVER,
                                     return_mus=True, return_mcs=True):
                 found.append((kind, frozenset(names[id(c)] for c in cons)))
+                if cap is not None and len(found) >= cap:
+                    break              # same per-step conflict cap as the incremental side
         steps.append({"frontier": set(act), "found": found,
                       "seconds": time.perf_counter() - ts})
         if apply_step(step, st, name2node) == "stop":
@@ -147,10 +153,11 @@ def ancestors_or_self(name, name2node):
     return out
 
 
-def verify(root, inc_rounds, base_steps):
+def verify(root, inc_rounds, base_steps, capped=False):
     name2node = {nd.get_full_name(): nd for nd in root.iter_nodes()}
     report = {"frontier_mismatch": [], "duplicates": [], "unsound": [], "unexplained": []}
     seen = set()                               # all (kind, names) incremental yielded so far
+    seen_per_state = set()                     # (state, kind, names): state-level no-repeat check
     seen_list = []
     n = min(len(inc_rounds), len(base_steps))
     for k in range(n):
@@ -160,14 +167,20 @@ def verify(root, inc_rounds, base_steps):
             report["frontier_mismatch"].append(
                 (k, sorted(inc["frontier"] ^ base["frontier"])))
         base_set = set(base["found"])
-        # V2 duplicates + V3 soundness
+        # V2 state-level duplicates (a conflict may legitimately reappear at a DIFFERENT state
+        # -- its committed context differs -- but never twice at the same state; cached re-shows
+        # are excluded by construction) + V3 soundness
         for cf in inc["found"]:
-            if cf in seen:
+            skey = (inc["state"],) + cf
+            if skey in seen_per_state:
                 report["duplicates"].append((k, cf))
-            if cf not in base_set:
+            seen_per_state.add(skey)
+            if not capped and cf not in base_set:
                 report["unsound"].append((k, cf))
             seen.add(cf)
             seen_list.append(cf)
+        if capped:
+            continue                            # V3/V4 need exhaustive sets on both sides
         # V4 completeness: base conflicts must be yielded now or refine an earlier one
         inc_now = set(inc["found"])
         for kind, fs in base["found"]:
@@ -188,14 +201,18 @@ def main():
     ap.add_argument("problem"); ap.add_argument("instance")
     ap.add_argument("--script", required=True)
     ap.add_argument("--budget", type=float, default=900.0)
+    ap.add_argument("--cap", type=int, default=None,
+                    help="per-step conflict cap applied to BOTH back-ends (fair capped mode); "
+                         "default: exhaustive")
     ap.add_argument("--per-step", action="store_true")
     args = ap.parse_args()
 
     script = json.loads(Path(args.script).read_text(encoding="utf-8"))
     root, hard = hierarchy.load_instance(args.problem, args.instance)
 
-    t_inc, inc_done, inc_rounds = replay_incremental(root, hard, script, args.budget)
-    t_base, base_done, base_steps = replay_base(root, hard, script, args.budget)
+    t_inc, inc_done, inc_rounds = replay_incremental(root, hard, script, args.budget,
+                                                     cap=args.cap)
+    t_base, base_done, base_steps = replay_base(root, hard, script, args.budget, cap=args.cap)
 
     print(f"script steps: {len(script)}")
     print(f"incremental: {t_inc:8.1f}s completed={inc_done} rounds={len(inc_rounds)} "
@@ -210,10 +227,13 @@ def main():
                   f"{'%6.1fs/%3d new' % (i['seconds'], len(i['found'])) if i else '   --'}"
                   f"   base {'%6.1fs/%3d' % (b['seconds'], len(b['found'])) if b else '   --'}"
                   f"   frontier={len(b['frontier']) if b else (len(i['frontier']) if i else 0)}")
-    rep = verify(root, inc_rounds, base_steps)
-    print("\nverification:")
+    rep = verify(root, inc_rounds, base_steps, capped=args.cap is not None)
+    print(f"\nverification{' (capped mode: V3/V4 skipped)' if args.cap is not None else ''}:")
     for k, v in rep.items():
         print(f"  {k:18}: {len(v)}" + (f"   e.g. {v[:2]}" if v else ""))
+    ncached = sum(len(r.get("cached", [])) for r in inc_rounds)
+    if ncached:
+        print(f"  (cached re-shows delivered on backtrack: {ncached})")
 
 
 if __name__ == "__main__":
