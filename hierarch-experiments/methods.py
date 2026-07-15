@@ -594,6 +594,103 @@ def run_fresh_restart(root, hard, S, seed=0, time_budget=600.0):
                                method="hierarch-fresh-restart")
 
 
+def run_hierarch_commit_nocap_baseline(root, hard, S, seed=0, time_budget=600.0):
+    """``hierarch-commit-nocap`` driven by BASELINE MARCO instead of the incremental enumerator:
+    at every round, flat ``marco`` is re-run FROM SCRATCH (fresh core + map solver) on the
+    current frontier's grouped constraints, exhaustively (no cap), and ALL conflicts are shown
+    to the oracle. Nothing persists between rounds -- previously found conflicts are re-derived
+    and re-shown every round (the oracle's own registry dedupes them). State (frontier / pruned /
+    relaxed / snapshots) is tracked by hand, mirroring the enumerator's commit semantics."""
+    oracle = HierarchCommitOracle(root, hard, S, seed=seed, time_budget=time_budget)
+    oracle.t0 = time.perf_counter()
+    deadline = oracle.t0 + time_budget
+
+    name2node = {nd.get_full_name(): nd for nd in root.iter_nodes()}
+    frontier = [c.get_full_name() for c in root.children]
+    pruned, relaxed = set(), set()
+    round_idx = 0
+    timed_out_flag = False
+
+    while True:
+        round_idx += 1
+        if time.perf_counter() > deadline:
+            timed_out_flag = True
+            break
+        active = [g for g in frontier if g not in relaxed and g not in pruned]
+        gc = {g: name2node[g].get_grouped_constraint() for g in active}
+        soft = [gc[g] for g in active if gc[g] is not None]
+        names = {id(gc[g]): g for g in active if gc[g] is not None}
+        hard_now = list(hard) + [name2node[g].get_grouped_constraint() for g in pruned
+                                 if name2node[g].get_grouped_constraint() is not None]
+        results = []
+        if soft:
+            for kind, cons in marco(soft, hard_now, solver=SOLVER, map_solver=MAP_SOLVER,
+                                    return_mus=True, return_mcs=True):
+                results.append({"kind": kind,
+                                "names": [names[id(c)] for c in cons]})
+                if time.perf_counter() > deadline:
+                    timed_out_flag = True
+                    break
+        if timed_out_flag:
+            break
+
+        action = oracle({
+            "round": round_idx,
+            "frontier": list(frontier),
+            "frontier_nodes": [name2node[g] for g in frontier],
+            "free": list(active),
+            "refinable": [g for g in frontier if name2node[g].children],
+            "results": results,
+            "capped": False,                     # exhaustive per round, like nocap
+            "committed_relaxed": sorted(relaxed),
+            "committed_background": sorted(pruned),
+            "state": {"frontier": list(frontier), "pruned": set(pruned),
+                      "relaxed": set(relaxed)},
+        })
+        a = action.get("action")
+        if a == "stop" or not a:
+            break
+        if a == "continue":
+            continue                             # cannot happen (capped=False); harmless
+        if a == "restore":
+            st = action["state"]
+            frontier = list(st["frontier"])
+            pruned, relaxed = set(st["pruned"]), set(st["relaxed"])
+            continue
+        if a == "commit":
+            mcs = set(action["mcs"])
+            for g in list(frontier):
+                if g in relaxed or g in pruned:
+                    continue
+                if g in mcs:
+                    if not name2node[g].children:
+                        relaxed.add(g)
+                else:
+                    pruned.add(g)
+            continue
+        if a == "refine":
+            for nm in action["constraints"]:
+                children = [c.get_full_name() for c in name2node[nm].children
+                            if c.get_grouped_constraint() is not None]
+                frontier = [x for x in frontier if x != nm] + children
+            continue
+        raise ValueError(f"unknown action {action!r}")
+
+    elapsed = time.perf_counter() - oracle.t0
+    rel = set(oracle.relaxed) if oracle.relaxed else set(relaxed)
+    repaired = _repaired(root, hard, rel)
+    if oracle.result is None:
+        oracle.result = "repaired" if repaired else "timeout"
+    pruned_leaves = sum(len(name2node[g].leaves()) for g in oracle.background or pruned)
+    decisions = (oracle.n_commit + oracle.n_refine + oracle.n_backtrack + oracle.n_restart
+                 + oracle.n_continue)
+    return _metrics("hierarch-commit-nocap-baseline", decisions=decisions,
+                    judgments=oracle.judgments, relaxed=len(rel), pruned=pruned_leaves,
+                    commits=oracle.n_commit, backtracks=oracle.n_backtrack,
+                    timed_out=(oracle.result == "timeout" or timed_out_flag),
+                    elapsed=elapsed, repaired=repaired)
+
+
 def run_portfolio(root, hard, S, seed=0, time_budget=600.0, round_cap=ROUND_CAP,
                   method="hierarch-portfolio"):
     """PORTFOLIO of the three complementary commit rules (base / premature / random -- overlap
@@ -648,6 +745,7 @@ METHODS = {
     "hierarch-premature-commit": run_premature_commit,       # commit when it is the ONLY ps option
     "hierarch-random-commit": run_random_commit,             # random ps commit once frontier > 20
     "hierarch-fresh-restart": run_fresh_restart,             # truly-random restart after 100 stale steps
+    "hierarch-commit-nocap-baseline": run_hierarch_commit_nocap_baseline,
     "hierarch-portfolio": run_portfolio,                     # base -> premature -> random, budget/3 each
     "hierarch-portfolio-nocap": run_portfolio_nocap,         # portfolio with no round cap
     "hierarch-step-backtrack": run_step_backtrack,           # force backtrack after 50 stale branch steps
