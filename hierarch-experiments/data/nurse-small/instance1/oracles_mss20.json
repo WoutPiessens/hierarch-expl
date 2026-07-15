@@ -1,0 +1,87 @@
+[
+  {
+    "scheme": "mss-20",
+    "seed": 0,
+    "pct": 20.0,
+    "k": 8,
+    "corr_size": 7,
+    "S": [
+      "cover week0 day4",
+      "cover week0 day5",
+      "cover week0 day6",
+      "cover week1 day9",
+      "shift_off nurseF week1 day8",
+      "shift_off nurseH week0 day2",
+      "shift_on nurseH week1 day11",
+      "shift_on nurseH week1 day12"
+    ]
+  },
+  {
+    "scheme": "mss-20",
+    "seed": 1,
+    "pct": 20.0,
+    "k": 8,
+    "corr_size": 6,
+    "S": [
+      "cover week0 day4",
+      "cover week0 day5",
+      "cover week1 day10",
+      "cover week1 day12",
+      "cover week1 day13",
+      "cover week1 day8",
+      "shift_off nurseC week1 day13",
+      "shift_on nurseF week0 day0"
+    ]
+  },
+  {
+    "scheme": "mss-20",
+    "seed": 2,
+    "pct": 20.0,
+    "k": 8,
+    "corr_size": 5,
+    "S": [
+      "cover week0 day0",
+      "cover week0 day5",
+      "cover week0 day6",
+      "cover week1 day11",
+      "shift_off nurseF week1 day8",
+      "shift_on nurseC week0 day1",
+      "shift_on nurseH week1 day12",
+      "shift_on nurseH week1 day13"
+    ]
+  },
+  {
+    "scheme": "mss-20",
+    "seed": 3,
+    "pct": 20.0,
+    "k": 8,
+    "corr_size": 8,
+    "S": [
+      "cover week0 day4",
+      "cover week1 day10",
+      "cover week1 day12",
+      "cover week1 day13",
+      "cover week1 day7",
+      "cover week1 day8",
+      "shift_on nurseB week0 day4",
+      "shift_on nurseC week0 day0"
+    ]
+  },
+  {
+    "scheme": "mss-20",
+    "seed": 4,
+    "pct": 20.0,
+    "k": 8,
+    "corr_size": 5,
+    "S": [
+      "cover week0 day4",
+      "cover week0 day5",
+      "cover week0 day6",
+      "cover week1 day10",
+      "cover week1 day11",
+      "cover week1 day8",
+      "shift_off nurseH week0 day2",
+      "shift_on nurseF week0 day1"
+    ]
+  }
+]

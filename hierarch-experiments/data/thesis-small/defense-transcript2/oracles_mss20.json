@@ -1,0 +1,77 @@
+[
+  {
+    "scheme": "mss-20",
+    "seed": 0,
+    "pct": 20.0,
+    "k": 6,
+    "corr_size": 6,
+    "S": [
+      "already-allocated 4",
+      "person-unavailable Person1 2026-01-01 10:00:00",
+      "person-unavailable Person3 2026-01-01 11:00:00",
+      "room-unavailable 200C 00.01 2026-01-01 09:00:00",
+      "room-unavailable 200C 00.01 2026-01-01 10:00:00",
+      "room-unavailable 200C 00.02 2026-01-01 16:00:00"
+    ]
+  },
+  {
+    "scheme": "mss-20",
+    "seed": 2,
+    "pct": 20.0,
+    "k": 6,
+    "corr_size": 6,
+    "S": [
+      "already-allocated 4",
+      "person-unavailable Person1 2026-01-01 11:00:00",
+      "person-unavailable Person3 2026-01-01 13:00:00",
+      "room-unavailable 200C 00.01 2026-01-01 13:00:00",
+      "room-unavailable 200C 00.01 2026-01-01 15:00:00",
+      "room-unavailable 200C 00.02 2026-01-01 15:00:00"
+    ]
+  },
+  {
+    "scheme": "mss-20",
+    "seed": 3,
+    "pct": 20.0,
+    "k": 6,
+    "corr_size": 5,
+    "S": [
+      "already-allocated 2",
+      "person-unavailable Person1 2026-01-01 11:00:00",
+      "person-unavailable Person3 2026-01-01 13:00:00",
+      "room-unavailable 200C 00.01 2026-01-01 11:00:00",
+      "room-unavailable 200C 00.01 2026-01-01 13:00:00",
+      "room-unavailable 200C 00.01 2026-01-01 14:00:00"
+    ]
+  },
+  {
+    "scheme": "mss-20",
+    "seed": 4,
+    "pct": 20.0,
+    "k": 6,
+    "corr_size": 6,
+    "S": [
+      "already-allocated 4",
+      "person-unavailable Person1 2026-01-01 11:00:00",
+      "person-unavailable Person3 2026-01-01 11:00:00",
+      "room-unavailable 200C 00.01 2026-01-01 09:00:00",
+      "room-unavailable 200C 00.01 2026-01-01 11:00:00",
+      "room-unavailable 200C 00.02 2026-01-01 15:00:00"
+    ]
+  },
+  {
+    "scheme": "mss-20",
+    "seed": 5,
+    "pct": 20.0,
+    "k": 6,
+    "corr_size": 6,
+    "S": [
+      "already-allocated 5",
+      "person-unavailable Person2 2026-01-01 16:00:00",
+      "person-unavailable Person3 2026-01-01 13:00:00",
+      "room-unavailable 200C 00.01 2026-01-01 13:00:00",
+      "room-unavailable 200C 00.02 2026-01-01 14:00:00",
+      "room-unavailable 200C 00.02 2026-01-01 15:00:00"
+    ]
+  }
+]

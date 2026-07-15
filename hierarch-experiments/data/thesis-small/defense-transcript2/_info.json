@@ -1,0 +1,9 @@
+{
+  "problem": "thesis",
+  "instance": "defense-transcript2",
+  "source": "transcript_2_hierarchy (anonymised)",
+  "n_all": 3403,
+  "n_hard": 3372,
+  "n_soft_leaves": 31,
+  "n_persons_anonymised": 3
+}

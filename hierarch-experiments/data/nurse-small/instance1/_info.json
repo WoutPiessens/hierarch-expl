@@ -1,0 +1,7 @@
+{
+  "problem": "nurse",
+  "instance": "instance1",
+  "n_all": 360,
+  "n_hard": 320,
+  "n_soft_leaves": 40
+}
