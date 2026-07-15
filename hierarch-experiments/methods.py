@@ -223,6 +223,7 @@ class HierarchCommitOracle:
                                                  # never re-commit the SAME group-MCS twice
         # outcome + metrics
         self.n_commit = self.n_refine = self.n_backtrack = self.n_restart = 0
+        self.n_continue = 0                      # cap-truncated rounds continued instead of failing
         self.judgments = 0
         self._initial_state = None               # enumerator state at round 1 (for fresh restarts)
         self.result = None
@@ -337,7 +338,18 @@ class HierarchCommitOracle:
         # (3) BACKTRACK the last commit, else stop
         if self.stack:
             return self._commit_backtrack(ctx)
-        return self._stop("repaired" if self._is_repaired(rel) else "failed")
+        if self._is_repaired(rel):
+            return self._stop("repaired")
+        # (3b) NEVER fail while the round was cap-truncated: ctx["capped"] means the CURRENT
+        # frontier provably has conflicts the oracle has not been shown yet (the per-round cap
+        # deferred them), so "no options" only means the shown SAMPLE is exhausted. Fetch the
+        # next round_cap conflicts of the same frontier instead of failing early. Every run now
+        # ends "repaired" or "timeout" -- the early-fail category is eliminated by construction.
+        if ctx.get("capped"):
+            self.n_continue += 1
+            self.script.append({"action": "continue"})
+            return {"action": "continue"}
+        return self._stop("failed")
 
     def _commit(self, ctx, M, open_names):
         self.n_commit += 1
@@ -543,7 +555,8 @@ def run_hierarch_commit(root, hard, S, seed=0, time_budget=600.0, round_cap=ROUN
         oracle.result = "repaired" if repaired else "timeout"
     # pruned primitives = number of leaf constraints inside the final background (pruned) groups
     pruned = sum(len(oracle.name2node[g].leaves()) for g in oracle.background)
-    decisions = oracle.n_commit + oracle.n_refine + oracle.n_backtrack + oracle.n_restart
+    decisions = (oracle.n_commit + oracle.n_refine + oracle.n_backtrack + oracle.n_restart
+                 + oracle.n_continue)
     return _metrics(method, decisions=decisions, judgments=oracle.judgments,
                     relaxed=len(relaxed), pruned=pruned, commits=oracle.n_commit,
                     backtracks=oracle.n_backtrack, timed_out=(oracle.result == "timeout"),

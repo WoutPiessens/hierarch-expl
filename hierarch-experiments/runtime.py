@@ -67,6 +67,8 @@ class _ScriptedDecider:
         if a == "backtrack":
             st = self.commit_states.pop() if self.commit_states else ctx["state"]
             return {"action": "restore", "state": st}
+        if a == "continue":
+            return {"action": "continue"}
         return {"action": "stop"}
 
 
