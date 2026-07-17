@@ -1,0 +1,8 @@
+{
+  "problem": "workforce-suite",
+  "instance": "ews-d12-o2",
+  "measured_natural_mcs": {
+    "mean": 16.8
+  },
+  "provenance": "benchmark-suite extraction 2026-07-17"
+}

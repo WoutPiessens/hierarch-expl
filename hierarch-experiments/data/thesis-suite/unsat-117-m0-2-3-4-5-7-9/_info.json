@@ -1,0 +1,8 @@
+{
+  "problem": "thesis-suite",
+  "instance": "unsat-117-m0-2-3-4-5-7-9",
+  "measured_natural_mcs": {
+    "mean": 8.6
+  },
+  "provenance": "benchmark-suite extraction 2026-07-17; 37 persons anonymised"
+}

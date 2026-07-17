@@ -1,0 +1,8 @@
+{
+  "problem": "nurse-suite",
+  "instance": "instance1-n6-s2",
+  "measured_natural_mcs": {
+    "mean": 10.0
+  },
+  "provenance": "benchmark-suite extraction 2026-07-17"
+}
