@@ -691,6 +691,15 @@ def run_hierarch_commit_nocap_baseline(root, hard, S, seed=0, time_budget=600.0)
                     elapsed=elapsed, repaired=repaired)
 
 
+def run_premature_commit_nocap(root, hard, S, seed=0, time_budget=600.0):
+    """PREMATURE COMMIT with NO round cap: every group MUS/MCS of the current frontier is
+    enumerated before the oracle decides (cf. hierarch-commit-nocap), combined with the
+    premature rule (commit an MCS when it is the ONLY potentially suitable option)."""
+    return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                               round_cap=None, oracle_cls=HierarchPrematureCommitOracle,
+                               method="hierarch-premature-commit-nocap")
+
+
 def run_portfolio(root, hard, S, seed=0, time_budget=600.0, round_cap=ROUND_CAP,
                   method="hierarch-portfolio"):
     """PORTFOLIO of the three complementary commit rules (base / premature / random -- overlap
@@ -746,6 +755,7 @@ METHODS = {
     "hierarch-random-commit": run_random_commit,             # random ps commit once frontier > 20
     "hierarch-fresh-restart": run_fresh_restart,             # truly-random restart after 100 stale steps
     "hierarch-commit-nocap-baseline": run_hierarch_commit_nocap_baseline,
+    "hierarch-premature-commit-nocap": run_premature_commit_nocap,
     "hierarch-portfolio": run_portfolio,                     # base -> premature -> random, budget/3 each
     "hierarch-portfolio-nocap": run_portfolio_nocap,         # portfolio with no round cap
     "hierarch-step-backtrack": run_step_backtrack,           # force backtrack after 50 stale branch steps
