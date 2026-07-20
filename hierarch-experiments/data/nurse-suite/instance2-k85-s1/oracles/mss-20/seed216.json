@@ -1,0 +1,22 @@
+{
+  "scheme": "mss-20",
+  "seed": 216,
+  "pct": 20.0,
+  "k": 13,
+  "corr_size": 13,
+  "S": [
+    "cover week1 day12",
+    "cover week1 day13",
+    "shift_off nurseJ week0 day5",
+    "shift_on nurseA week0 day5",
+    "shift_on nurseE week1 day12",
+    "shift_on nurseE week1 day13",
+    "shift_on nurseI week1 day12",
+    "shift_on nurseK week1 day7",
+    "shift_on nurseL week1 day11",
+    "shift_on nurseL week1 day12",
+    "shift_on nurseM week0 day3",
+    "shift_on nurseM week1 day7",
+    "shift_on nurseN week0 day2"
+  ]
+}

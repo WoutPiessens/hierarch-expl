@@ -1,0 +1,32 @@
+{
+  "scheme": "mss-20",
+  "seed": 211,
+  "pct": 20.0,
+  "k": 23,
+  "corr_size": 7,
+  "S": [
+    "is-allocated is-allocated.L is-allocated.L.L is-allocated.L.L.L task3",
+    "is-allocated is-allocated.L is-allocated.L.L is-allocated.L.L.L task8",
+    "is-allocated is-allocated.L is-allocated.L.L is-allocated.L.L.R task13",
+    "is-allocated is-allocated.L is-allocated.L.L is-allocated.L.L.R task15",
+    "is-allocated is-allocated.L is-allocated.L.L is-allocated.L.L.R task20",
+    "is-allocated is-allocated.L is-allocated.L.R is-allocated.L.R.L task25",
+    "is-allocated is-allocated.L is-allocated.L.R is-allocated.L.R.L task27",
+    "is-allocated is-allocated.L is-allocated.L.R is-allocated.L.R.L task28",
+    "is-allocated is-allocated.L is-allocated.L.R is-allocated.L.R.L task30",
+    "is-allocated is-allocated.L is-allocated.L.R is-allocated.L.R.L task31",
+    "is-allocated is-allocated.L is-allocated.L.R is-allocated.L.R.L task36",
+    "is-allocated is-allocated.R is-allocated.R.L is-allocated.R.L.L task52",
+    "is-allocated is-allocated.R is-allocated.R.L is-allocated.R.L.L task53",
+    "is-allocated is-allocated.R is-allocated.R.L is-allocated.R.L.L task60",
+    "is-allocated is-allocated.R is-allocated.R.L is-allocated.R.L.R task62",
+    "is-allocated is-allocated.R is-allocated.R.L is-allocated.R.L.R task63",
+    "is-allocated is-allocated.R is-allocated.R.L is-allocated.R.L.R task72",
+    "is-allocated is-allocated.R is-allocated.R.R is-allocated.R.R.L task76",
+    "is-allocated is-allocated.R is-allocated.R.R is-allocated.R.R.L task82",
+    "is-allocated is-allocated.R is-allocated.R.R is-allocated.R.R.R task88",
+    "same-allocation same-allocation.R same-allocation.R.L same-allocation.R.L.L team68625",
+    "same-allocation same-allocation.R same-allocation.R.L same-allocation.R.L.L team6a603",
+    "same-allocation same-allocation.R same-allocation.R.R same-allocation.R.R.R teamd34f7"
+  ]
+}

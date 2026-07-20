@@ -1,0 +1,2312 @@
+{
+  "nurse": {
+    "instance1-n6-s1": {
+      "mean_natural_mcs": 8.4,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/nurse-suite/instance1-n6-s1",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 7,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 10,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 220,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 224,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 226,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 232,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 242,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 245,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 257,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 264,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        },
+        {
+          "seed": 266,
+          "corr_size": 8,
+          "S_size": 8,
+          "pct": 20.0
+        }
+      ]
+    },
+    "instance1-n6-s2": {
+      "mean_natural_mcs": 10.0,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/nurse-suite/instance1-n6-s2",
+      "oracles": [
+        {
+          "seed": 2000,
+          "corr_size": 9,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2001,
+          "corr_size": 8,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2002,
+          "corr_size": 10,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2003,
+          "corr_size": 10,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2004,
+          "corr_size": 8,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2200,
+          "corr_size": 10,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2201,
+          "corr_size": 10,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2202,
+          "corr_size": 8,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2205,
+          "corr_size": 8,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2209,
+          "corr_size": 9,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2212,
+          "corr_size": 8,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2215,
+          "corr_size": 8,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2218,
+          "corr_size": 9,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2219,
+          "corr_size": 8,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2221,
+          "corr_size": 9,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2222,
+          "corr_size": 8,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2223,
+          "corr_size": 9,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2224,
+          "corr_size": 10,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2225,
+          "corr_size": 10,
+          "S_size": 10,
+          "pct": 30.0
+        },
+        {
+          "seed": 2226,
+          "corr_size": 8,
+          "S_size": 10,
+          "pct": 30.0
+        }
+      ]
+    },
+    "instance2-k85-s1": {
+      "mean_natural_mcs": 14.2,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/nurse-suite/instance2-k85-s1",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 13,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 13,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 13,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 5,
+          "corr_size": 11,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 6,
+          "corr_size": 12,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 9,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 9,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 10,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 13,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 12,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 11,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 9,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 10,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 9,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 9,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 10,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 8,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 10,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 215,
+          "corr_size": 11,
+          "S_size": 13,
+          "pct": 20.0
+        },
+        {
+          "seed": 216,
+          "corr_size": 13,
+          "S_size": 13,
+          "pct": 20.0
+        }
+      ]
+    },
+    "instance2-k90-s1": {
+      "mean_natural_mcs": 11.8,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/nurse-suite/instance2-k90-s1",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 14,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 10,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 11,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 11,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 13,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 13,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 14,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 13,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 13,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 12,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 9,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 11,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 12,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 12,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 14,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 13,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 13,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 216,
+          "corr_size": 14,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 217,
+          "corr_size": 12,
+          "S_size": 14,
+          "pct": 20.0
+        },
+        {
+          "seed": 218,
+          "corr_size": 10,
+          "S_size": 14,
+          "pct": 20.0
+        }
+      ]
+    },
+    "instance2": {
+      "mean_natural_mcs": 16.0,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/nurse-suite/instance2",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 14,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 11,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 5,
+          "corr_size": 15,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 6,
+          "corr_size": 13,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 7,
+          "corr_size": 13,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 8,
+          "corr_size": 13,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 9,
+          "corr_size": 12,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 12,
+          "corr_size": 13,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 14,
+          "corr_size": 14,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 17,
+          "corr_size": 15,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 19,
+          "corr_size": 12,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 25,
+          "corr_size": 13,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 30,
+          "corr_size": 14,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 33,
+          "corr_size": 13,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 34,
+          "corr_size": 12,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 36,
+          "corr_size": 14,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 37,
+          "corr_size": 11,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 39,
+          "corr_size": 11,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 40,
+          "corr_size": 12,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 41,
+          "corr_size": 15,
+          "S_size": 15,
+          "pct": 20.0
+        }
+      ]
+    },
+    "instance4-k70-s1": {
+      "mean_natural_mcs": 7.2,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/nurse-suite/instance4-k70-s1",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 8,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 6,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 7,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 6,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 9,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 5,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 5,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 6,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 5,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 10,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 7,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 6,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 10,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 208,
+          "corr_size": 9,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 209,
+          "corr_size": 9,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 10,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 7,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 5,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 9,
+          "S_size": 15,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 10,
+          "S_size": 15,
+          "pct": 20.0
+        }
+      ]
+    }
+  },
+  "thesis": {
+    "defense-transcript4": {
+      "mean_natural_mcs": 15.4,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/thesis-suite/defense-transcript4",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 15,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 18,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 15,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 15,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 14,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 5,
+          "corr_size": 17,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 6,
+          "corr_size": 13,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 7,
+          "corr_size": 15,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 8,
+          "corr_size": 18,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 9,
+          "corr_size": 17,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 10,
+          "corr_size": 13,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 11,
+          "corr_size": 16,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 12,
+          "corr_size": 14,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 13,
+          "corr_size": 16,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 14,
+          "corr_size": 16,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 15,
+          "corr_size": 15,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 16,
+          "corr_size": 15,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 17,
+          "corr_size": 17,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 18,
+          "corr_size": 16,
+          "S_size": 94,
+          "pct": 20.0
+        },
+        {
+          "seed": 19,
+          "corr_size": 18,
+          "S_size": 94,
+          "pct": 20.0
+        }
+      ]
+    },
+    "unsat-115-m1-2-3-4-5-7-9": {
+      "mean_natural_mcs": 11.2,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/thesis-suite/unsat-115-m1-2-3-4-5-7-9",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 12,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 13,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 10,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 10,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 11,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 12,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 11,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 10,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 11,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 10,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 9,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 13,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 16,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 208,
+          "corr_size": 11,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 209,
+          "corr_size": 11,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 15,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 10,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 12,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 10,
+          "S_size": 71,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 11,
+          "S_size": 71,
+          "pct": 20.0
+        }
+      ]
+    },
+    "unsat-115-m1-2-3-4-5": {
+      "mean_natural_mcs": 9.2,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/thesis-suite/unsat-115-m1-2-3-4-5",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 8,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 9,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 10,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 8,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 11,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 10,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 10,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 8,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 8,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 8,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 8,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 8,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 10,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 208,
+          "corr_size": 9,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 209,
+          "corr_size": 9,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 11,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 8,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 10,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 8,
+          "S_size": 66,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 8,
+          "S_size": 66,
+          "pct": 20.0
+        }
+      ]
+    },
+    "unsat-115-m1-2-3-4": {
+      "mean_natural_mcs": 7.2,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/thesis-suite/unsat-115-m1-2-3-4",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 6,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 8,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 8,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 7,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 7,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 8,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 8,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 8,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 9,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 7,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 7,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 8,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 8,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 208,
+          "corr_size": 7,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 209,
+          "corr_size": 7,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 10,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 7,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 7,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 8,
+          "S_size": 57,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 7,
+          "S_size": 57,
+          "pct": 20.0
+        }
+      ]
+    },
+    "unsat-117-m0-2-3-4-5-7-9": {
+      "mean_natural_mcs": 8.6,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/thesis-suite/unsat-117-m0-2-3-4-5-7-9",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 10,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 12,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 11,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 12,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 208,
+          "corr_size": 10,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 209,
+          "corr_size": 10,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 10,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        }
+      ]
+    },
+    "unsat-117-m0-2-3-4-5-7": {
+      "mean_natural_mcs": 7.6,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/thesis-suite/unsat-117-m0-2-3-4-5-7",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 7,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 7,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 7,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 10,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 10,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 10,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 208,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 209,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 9,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 7,
+          "S_size": 75,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 8,
+          "S_size": 75,
+          "pct": 20.0
+        }
+      ]
+    }
+  },
+  "workforce": {
+    "ews-d11-o4": {
+      "mean_natural_mcs": 8.0,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/workforce-suite/ews-d11-o4",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 9,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 12,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 9,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 3,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 7,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 7,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 8,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 7,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 7,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 11,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 5,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 5,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 6,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 208,
+          "corr_size": 10,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 209,
+          "corr_size": 9,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 5,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 7,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 5,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 6,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 5,
+          "S_size": 23,
+          "pct": 20.0
+        }
+      ]
+    },
+    "ews-d12-o1": {
+      "mean_natural_mcs": 16.4,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/workforce-suite/ews-d12-o1",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 20,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 21,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 13,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 12,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 16,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 11,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 17,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 11,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 13,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 20,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 16,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 18,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 14,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 208,
+          "corr_size": 11,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 209,
+          "corr_size": 15,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 13,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 11,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 15,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 7,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 10,
+          "S_size": 23,
+          "pct": 20.0
+        }
+      ]
+    },
+    "ews-d12-o2": {
+      "mean_natural_mcs": 16.8,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/workforce-suite/ews-d12-o2",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 20,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 22,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 14,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 12,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 16,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 12,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 18,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 11,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 14,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 20,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 17,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 18,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 16,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 208,
+          "corr_size": 13,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 209,
+          "corr_size": 17,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 14,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 11,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 16,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 8,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 11,
+          "S_size": 23,
+          "pct": 20.0
+        }
+      ]
+    },
+    "ews-d12-t90-s1": {
+      "mean_natural_mcs": 12.8,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/workforce-suite/ews-d12-t90-s1",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 16,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 7,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 13,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 12,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 16,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 10,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 8,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 13,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 11,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 13,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 9,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 8,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 9,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 208,
+          "corr_size": 7,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 209,
+          "corr_size": 9,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 10,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 8,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 19,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 16,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 6,
+          "S_size": 21,
+          "pct": 20.0
+        }
+      ]
+    },
+    "ews-d12-t90-s2": {
+      "mean_natural_mcs": 9.2,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/workforce-suite/ews-d12-t90-s2",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 10,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 4,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 12,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 12,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 8,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 200,
+          "corr_size": 7,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 201,
+          "corr_size": 6,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 202,
+          "corr_size": 5,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 203,
+          "corr_size": 6,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 204,
+          "corr_size": 9,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 205,
+          "corr_size": 9,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 206,
+          "corr_size": 5,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 207,
+          "corr_size": 7,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 208,
+          "corr_size": 8,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 209,
+          "corr_size": 7,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 210,
+          "corr_size": 6,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 211,
+          "corr_size": 6,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 212,
+          "corr_size": 12,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 213,
+          "corr_size": 8,
+          "S_size": 21,
+          "pct": 20.0
+        },
+        {
+          "seed": 214,
+          "corr_size": 3,
+          "S_size": 21,
+          "pct": 20.0
+        }
+      ]
+    },
+    "ews-instance103": {
+      "mean_natural_mcs": 16.8,
+      "n_oracles": 20,
+      "leaves": null,
+      "path": "data/workforce-suite/ews-instance103",
+      "oracles": [
+        {
+          "seed": 0,
+          "corr_size": 20,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 1,
+          "corr_size": 22,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 2,
+          "corr_size": 14,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 3,
+          "corr_size": 12,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 4,
+          "corr_size": 16,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 5,
+          "corr_size": 21,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 6,
+          "corr_size": 9,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 7,
+          "corr_size": 19,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 8,
+          "corr_size": 10,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 9,
+          "corr_size": 17,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 10,
+          "corr_size": 9,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 12,
+          "corr_size": 17,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 13,
+          "corr_size": 9,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 14,
+          "corr_size": 9,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 15,
+          "corr_size": 12,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 16,
+          "corr_size": 10,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 17,
+          "corr_size": 23,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 18,
+          "corr_size": 15,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 19,
+          "corr_size": 21,
+          "S_size": 23,
+          "pct": 20.0
+        },
+        {
+          "seed": 20,
+          "corr_size": 20,
+          "S_size": 23,
+          "pct": 20.0
+        }
+      ]
+    }
+  }
+}
