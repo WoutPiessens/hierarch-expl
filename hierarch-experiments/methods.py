@@ -322,9 +322,14 @@ class HierarchCommitOracle:
         if act is not None:
             return act
 
-        # (2) REFINE toward a committable group-MCS
+        # (2) REFINE toward a committable group-MCS.
+        # NOTE: iterate open_names SORTED. It is a frozenset of strings, and Python randomises
+        # string hashes per process (PYTHONHASHSEED), so an unsorted iteration makes `cands`
+        # -- and hence pend[0]/branch[0]/rng.choice -- order-dependent on the process, not on
+        # the seed. That made runs irreproducible across machines/processes (measured: the same
+        # cell+seed solving in 2.6s, 8.6s, or timing out, in three consecutive runs).
         relevant = set().union(*self.gmcs, *self.gmus) if (self.gmcs or self.gmus) else set()
-        cands = [nm for nm in open_names if nm in relevant
+        cands = [nm for nm in sorted(open_names) if nm in relevant
                  and self.name2node[nm].children and self._potentially_suitable(nm)]
         pend = [c for c in cands if c in self.pending]
         branch = [c for c in cands if self._in_current_branch(c)]
