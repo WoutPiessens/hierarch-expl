@@ -31,9 +31,13 @@ CELLS = [   # (problem, instance, oracle seed, oracle class, round_cap)
 ]
 
 
-def fingerprint(script):
+def fingerprint(script, k=None):
+    """md5 of the (first k steps of the) decision script. The PREFIX fingerprint is the sharp
+    reproducibility test: a wall-clock budget cuts a timed-out trajectory at a machine-dependent
+    point, so full fingerprints legitimately differ across machines, but the path leading there
+    must be identical if the search is deterministic."""
     parts = []
-    for s in script:
+    for s in (script[:k] if k else script):
         a = s["action"]
         if a == "refine":
             parts.append(f"R:{s['group']}")
@@ -64,7 +68,9 @@ def main():
             "cell": f"{problem}/{inst}/s{seed}/{cls.__name__}/cap={cap}",
             "steps": len(oracle.script), "result": oracle.result,
             "repaired": _repaired(root, hard, set(oracle.relaxed)),
-            "relaxed": len(set(oracle.relaxed)), "fp": fingerprint(oracle.script),
+            "relaxed": len(set(oracle.relaxed)),
+            "fp30": fingerprint(oracle.script, 30),      # prefix: must match everywhere
+            "fp": fingerprint(oracle.script),            # full: may differ if timed out
             "t": round(el, 1)}), flush=True)
 
 
