@@ -277,6 +277,19 @@ class HierarchCommitOracle:
                 and M not in committed_active and (open_names, M) not in self.abandoned
                 and all(self._potentially_suitable(g) for g in M)]
 
+    def _eager_ok(self, rec):
+        """early_stop predicate: accept a freshly-found conflict the moment it is a *committable*
+        group-MCS (>=1 leaf member, all members potentially suitable, not previously
+        committed/abandoned). Cutting the round here lets decide_step commit it after only PARTIAL
+        enumeration -- rule (1) of __call__ will find it in `options` and commit it directly."""
+        if rec["kind"] != "MCS":
+            return False
+        M = frozenset(rec["names"])
+        committed_active = {snap[-1] for snap in self.stack}
+        return (M not in self.abandoned_mcs and M not in committed_active
+                and any(self._is_leaf(g) for g in M)
+                and all(self._potentially_suitable(g) for g in M))
+
     # --- policy ---
     def __call__(self, ctx):
         for r in ctx["results"]:
@@ -599,14 +612,20 @@ def run_fresh_restart(root, hard, S, seed=0, time_budget=600.0):
                                method="hierarch-fresh-restart")
 
 
-def run_hierarch_commit_nocap_baseline(root, hard, S, seed=0, time_budget=600.0):
-    """``hierarch-commit-nocap`` driven by BASELINE MARCO instead of the incremental enumerator:
-    at every round, flat ``marco`` is re-run FROM SCRATCH (fresh core + map solver) on the
-    current frontier's grouped constraints, exhaustively (no cap), and ALL conflicts are shown
-    to the oracle. Nothing persists between rounds -- previously found conflicts are re-derived
-    and re-shown every round (the oracle's own registry dedupes them). State (frontier / pruned /
-    relaxed / snapshots) is tracked by hand, mirroring the enumerator's commit semantics."""
-    oracle = HierarchCommitOracle(root, hard, S, seed=seed, time_budget=time_budget)
+def _run_nocap_baseline(root, hard, S, *, method, oracle_cls, seed=0, time_budget=600.0,
+                        eager=False):
+    """Drive an oracle with BASELINE MARCO instead of the incremental enumerator: at every round,
+    flat ``marco`` is re-run FROM SCRATCH (fresh core + map solver) on the current frontier's
+    grouped constraints and ALL conflicts are shown to the oracle. Nothing persists between rounds
+    -- previously found conflicts are re-derived and re-shown every round (the oracle's own registry
+    dedupes them). State (frontier / pruned / relaxed / snapshots) is tracked by hand, mirroring the
+    enumerator's commit semantics.
+
+    :param eager: if True, stop the per-round ``marco`` enumeration the moment a committable MCS
+        appears (``oracle._eager_ok``) and mark the round ``capped`` -- the baseline analogue of the
+        incremental ``early_stop`` hook, so the oracle can commit after PARTIAL enumeration. A capped
+        round also keeps the premature (only-option) rule gated to fully-enumerated rounds."""
+    oracle = oracle_cls(root, hard, S, seed=seed, time_budget=time_budget)
     oracle.t0 = time.perf_counter()
     deadline = oracle.t0 + time_budget
 
@@ -628,13 +647,17 @@ def run_hierarch_commit_nocap_baseline(root, hard, S, seed=0, time_budget=600.0)
         hard_now = list(hard) + [name2node[g].get_grouped_constraint() for g in pruned
                                  if name2node[g].get_grouped_constraint() is not None]
         results = []
+        capped = False
         if soft:
             for kind, cons in marco(soft, hard_now, solver=SOLVER, map_solver=MAP_SOLVER,
                                     return_mus=True, return_mcs=True):
-                results.append({"kind": kind,
-                                "names": [names[id(c)] for c in cons]})
+                rec = {"kind": kind, "names": [names[id(c)] for c in cons]}
+                results.append(rec)
                 if time.perf_counter() > deadline:
                     timed_out_flag = True
+                    break
+                if eager and oracle._eager_ok(rec):
+                    capped = True                # eager: commit this MCS after partial enumeration
                     break
         if timed_out_flag:
             break
@@ -646,7 +669,7 @@ def run_hierarch_commit_nocap_baseline(root, hard, S, seed=0, time_budget=600.0)
             "free": list(active),
             "refinable": [g for g in frontier if name2node[g].children],
             "results": results,
-            "capped": False,                     # exhaustive per round, like nocap
+            "capped": capped,
             "committed_relaxed": sorted(relaxed),
             "committed_background": sorted(pruned),
             "state": {"frontier": list(frontier), "pruned": set(pruned),
@@ -656,7 +679,7 @@ def run_hierarch_commit_nocap_baseline(root, hard, S, seed=0, time_budget=600.0)
         if a == "stop" or not a:
             break
         if a == "continue":
-            continue                             # cannot happen (capped=False); harmless
+            continue                             # a capped round with no committable option: re-run
         if a == "restore":
             st = action["state"]
             frontier = list(st["frontier"])
@@ -689,11 +712,17 @@ def run_hierarch_commit_nocap_baseline(root, hard, S, seed=0, time_budget=600.0)
     pruned_leaves = sum(len(name2node[g].leaves()) for g in oracle.background or pruned)
     decisions = (oracle.n_commit + oracle.n_refine + oracle.n_backtrack + oracle.n_restart
                  + oracle.n_continue)
-    return _metrics("hierarch-commit-nocap-baseline", decisions=decisions,
+    return _metrics(method, decisions=decisions,
                     judgments=oracle.judgments, relaxed=len(rel), pruned=pruned_leaves,
                     commits=oracle.n_commit, backtracks=oracle.n_backtrack,
                     timed_out=(oracle.result == "timeout" or timed_out_flag),
                     elapsed=elapsed, repaired=repaired)
+
+
+def run_hierarch_commit_nocap_baseline(root, hard, S, seed=0, time_budget=600.0):
+    """``hierarch-commit-nocap`` driven by baseline MARCO (see :func:`_run_nocap_baseline`)."""
+    return _run_nocap_baseline(root, hard, S, method="hierarch-commit-nocap-baseline",
+                               oracle_cls=HierarchCommitOracle, seed=seed, time_budget=time_budget)
 
 
 class HierarchCommitNocapEagerOracle(HierarchCommitOracle):
@@ -701,21 +730,26 @@ class HierarchCommitNocapEagerOracle(HierarchCommitOracle):
     frontier before deciding, commit a group-MCS the moment it is discovered during enumeration,
     provided it is committable (>=1 leaf member, all members potentially suitable, in the open
     frontier) and has not been committed/abandoned before. Realised via the enumerator's
-    `early_stop` hook, which cuts the round as soon as `_eager_ok` accepts a freshly-found MCS;
-    decide_step then commits it through the normal rule (options is non-empty by construction)."""
-
-    def _eager_ok(self, rec):
-        if rec["kind"] != "MCS":
-            return False
-        M = frozenset(rec["names"])
-        committed_active = {snap[-1] for snap in self.stack}
-        return (M not in self.abandoned_mcs and M not in committed_active
-                and any(self._is_leaf(g) for g in M)
-                and all(self._potentially_suitable(g) for g in M))
+    `early_stop` hook (`_eager_ok`, inherited), which cuts the round as soon as a committable MCS
+    appears; decide_step then commits it through the normal rule (options is non-empty)."""
 
 
-def run_hierarch_commit_nocap_eager(root, hard, S, seed=0, time_budget=600.0):
-    oracle = HierarchCommitNocapEagerOracle(root, hard, S, seed=seed, time_budget=time_budget)
+class HierarchPrematureCommitNocapEagerOracle(HierarchPrematureCommitOracle):
+    """Q1: premature-commit with NO round cap and EAGER staging. A *staging* commit of a
+    committable group-MCS may happen after PARTIAL enumeration -- `early_stop=_eager_ok` cuts the
+    round the moment such an MCS is found, and rule (1) of __call__ commits it. The PREMATURE rule
+    (commit the ONLY potentially-suitable option, even a not-strictly-committable one) stays gated
+    on FULL enumeration: `_alt_commit_action` returns None on any round that was cut short
+    (`ctx['capped']`), so it is only ever consulted after the whole frontier was enumerated."""
+
+    def _alt_commit_action(self, ctx, open_names):
+        if ctx.get("capped"):          # premature rule needs the FULLY enumerated frontier
+            return None
+        return super()._alt_commit_action(ctx, open_names)
+
+
+def _run_nocap_eager(method, oracle, root, hard, time_budget):
+    """Drive an eager (early_stop=_eager_ok) nocap oracle to completion and return its metrics."""
     oracle.t0 = time.perf_counter()
     deadline = oracle.t0 + time_budget
     for _ in hierarchical_marco(root, list(hard), solver=SOLVER, map_solver=MAP_SOLVER,
@@ -730,10 +764,159 @@ def run_hierarch_commit_nocap_eager(root, hard, S, seed=0, time_budget=600.0):
     pruned = sum(len(oracle.name2node[g].leaves()) for g in oracle.background)
     decisions = (oracle.n_commit + oracle.n_refine + oracle.n_backtrack + oracle.n_restart
                  + oracle.n_continue)
-    return _metrics("hierarch-commit-nocap-eager", decisions=decisions, judgments=oracle.judgments,
+    return _metrics(method, decisions=decisions, judgments=oracle.judgments,
                     relaxed=len(relaxed), pruned=pruned, commits=oracle.n_commit,
                     backtracks=oracle.n_backtrack, timed_out=(oracle.result == "timeout"),
                     elapsed=elapsed, repaired=repaired)
+
+
+def run_hierarch_commit_nocap_eager(root, hard, S, seed=0, time_budget=600.0):
+    oracle = HierarchCommitNocapEagerOracle(root, hard, S, seed=seed, time_budget=time_budget)
+    return _run_nocap_eager("hierarch-commit-nocap-eager", oracle, root, hard, time_budget)
+
+
+def run_premature_commit_nocap_eager(root, hard, S, seed=0, time_budget=600.0):
+    """Q1: premature-commit-nocap with eager primitive staging, driven by the INCREMENTAL enumerator
+    (premature only-option commit still requires full enumeration; committable-MCS staging fires on
+    partial enumeration via early_stop)."""
+    oracle = HierarchPrematureCommitNocapEagerOracle(root, hard, S, seed=seed, time_budget=time_budget)
+    return _run_nocap_eager("hierarch-premature-commit-nocap-eager", oracle, root, hard, time_budget)
+
+
+def run_premature_commit_nocap_eager_baseline(root, hard, S, seed=0, time_budget=600.0):
+    """Q1 under BASELINE MARCO: same eager premature-commit-nocap policy, but each round re-runs
+    flat marco from scratch (no incremental persistence). Eager staging is emulated by breaking the
+    per-round enumeration on the first committable MCS. Compared head-to-head with the incremental
+    variant to isolate the enumerator backend (cf. the hierarch-commit-nocap twins)."""
+    return _run_nocap_baseline(root, hard, S, method="hierarch-premature-commit-nocap-eager-baseline",
+                               oracle_cls=HierarchPrematureCommitNocapEagerOracle,
+                               seed=seed, time_budget=time_budget, eager=True)
+
+
+class HierarchStageUnionOracle(HierarchCommitOracle):
+    """Q3: STAGE-UNION pruning. Instead of committing a full group-MCS (relax ALL its leaves and
+    background every other open group), the oracle picks ONE potentially-suitable PRIMITIVE p to
+    *stage*: relax just p, and prune (background) only the constraints OUTSIDE U(p), where
+    U(p) = the union of all known group-MCSes that contain p (restricted to the open frontier).
+    The whole union stays open, so partners of p are never backgrounded and backtracking becomes
+    very unlikely.
+
+    CRUCIAL to convergence (relaxing a primitive adds no solver variables, so the incremental
+    enumerator yields nothing new afterwards): the registry of MUSes/MCSes is RETAINED across
+    rounds. When a stage prunes nothing, every known conflict stays available, so the oracle keeps
+    staging the remaining suitable leaves of a conflict -- from memory -- until the accumulated
+    relaxations cover a full MCS and repair the problem. Only entries touching a genuinely pruned
+    (backgrounded) or refined-away constraint are dropped. Because staging is greedy (one leaf at a
+    time, most-central first) and pruning is conservative, the final relaxed set is NOT guaranteed
+    minimal -- the runner reports the excess over a greedily minimised repair."""
+
+    def __init__(self, root, hard, S, seed=0, time_budget=None):
+        super().__init__(root, hard, S, seed=seed, time_budget=time_budget)
+        self.n_stage = 0
+
+    def _mcses_through(self, p):
+        return [M for M in self.gmcs if p in M]
+
+    def _stageable(self, open_names):
+        """Open leaf primitives that are suitable (p in S) and still occur in >=1 retained MCS --
+        i.e. an MCS with an as-yet-unrelaxed member we can make progress on."""
+        return [p for p in sorted(open_names)
+                if self._is_leaf(p) and p in self.S and self._mcses_through(p)]
+
+    def _pick_stage(self, stageable):
+        """Deterministic: the primitive occurring in the MOST retained MCSes (most 'central' -- its
+        union covers the most, and relaxing it makes the most progress), tie-broken by name."""
+        return max(stageable, key=lambda q: len(self._mcses_through(q)))  # stageable is name-sorted
+
+    def __call__(self, ctx):
+        for r in ctx["results"]:
+            fs = frozenset(r["names"])
+            if r["kind"] == "MCS" and fs not in self.gmcs:
+                self.gmcs.append(fs)
+            elif r["kind"] == "MUS" and fs not in self.gmus:
+                self.gmus.append(fs)
+        bg = set(ctx["committed_background"])
+        rel = set(ctx["committed_relaxed"])
+        open_names = frozenset(nd.get_full_name() for nd in ctx["frontier_nodes"]
+                               if nd.get_full_name() not in rel and nd.get_full_name() not in bg)
+        self.relaxed, self.background = list(rel), bg
+        if self._initial_state is None:
+            self._initial_state = ctx["state"]
+        # RETAIN the registry: keep every conflict whose members are all still open OR already
+        # relaxed. Nothing pruned -> nothing dropped (the sibling conflicts a stage leaves untouched
+        # stay available for the next exploration step). Only conflicts touching a backgrounded or
+        # refined-away constraint (not in open, not relaxed) become stale and are removed.
+        live = open_names | rel
+        self.gmcs = [M for M in self.gmcs if M <= live]
+        self.gmus = [M for M in self.gmus if M <= live]
+
+        if (self.time_budget is not None and self.t0 is not None
+                and time.perf_counter() - self.t0 >= self.time_budget):
+            return self._stop("timeout")
+        # stop the moment the accumulated relaxations repair the problem (before over-staging)
+        if rel and self._is_repaired(rel):
+            return self._stop("repaired")
+        if not open_names:
+            return self._stop("failed")
+
+        # (1) STAGE a suitable primitive occurring in some retained MCS.
+        stageable = self._stageable(open_names)
+        if stageable:
+            p = self._pick_stage(stageable)
+            keep = (set().union(*self._mcses_through(p)) & open_names)
+            return self._stage(ctx, p, keep)
+
+        # (2) REFINE toward exposing a stageable primitive (same candidate rule as base commit).
+        relevant = set().union(*self.gmcs, *self.gmus) if (self.gmcs or self.gmus) else set()
+        cands = [nm for nm in sorted(open_names) if nm in relevant
+                 and self.name2node[nm].children and self._potentially_suitable(nm)]
+        branch = [c for c in cands if self._in_current_branch(c)]
+        if branch:
+            return self._refine(ctx, branch[0])
+        if cands:
+            return self._refine(ctx, self.rng.choice(cands))
+
+        # (3) no options: repaired, else continue a capped round, else fail
+        if self._is_repaired(rel):
+            return self._stop("repaired")
+        if ctx.get("capped"):
+            self.n_continue += 1
+            self.script.append({"action": "continue"})
+            return {"action": "continue"}
+        return self._stop("failed")
+
+    def _stage(self, ctx, p, keep):
+        self.n_stage += 1
+        self.judgments += 1                                   # one judgment: is p suitable to relax?
+        # Do NOT wipe the registry here: relaxing p adds no new solver variables, so the enumerator
+        # will not re-derive the sibling conflicts. They are kept (and re-filtered for liveness at
+        # the top of __call__ next round) so the oracle can keep staging toward a full MCS.
+        self.last_refined = None
+        self.script.append({"action": "stage", "primitive": p, "keep": sorted(keep)})
+        return {"action": "stage", "relax": [p], "keep": sorted(keep)}
+
+
+def run_stage_union_nocap(root, hard, S, seed=0, time_budget=600.0):
+    """Q3: stage-union with deferred (nocap) enumeration. Reports `excess` = final relaxed size
+    minus a greedily minimised correction subset (this method does NOT guarantee minimality)."""
+    oracle = HierarchStageUnionOracle(root, hard, S, seed=seed, time_budget=time_budget)
+    oracle.t0 = time.perf_counter()
+    deadline = oracle.t0 + time_budget
+    for _ in hierarchical_marco(root, list(hard), solver=SOLVER, map_solver=MAP_SOLVER,
+                                decide_step=oracle, deadline=deadline, round_cap=None):
+        pass
+    elapsed = time.perf_counter() - oracle.t0
+    relaxed = set(oracle.relaxed)
+    repaired = _repaired(root, hard, relaxed)
+    if oracle.result is None:
+        oracle.result = "repaired" if repaired else "timeout"
+    pruned = sum(len(oracle.name2node[g].leaves()) for g in oracle.background)
+    excess = (len(relaxed) - _greedy_minimal(root, hard, relaxed)) if repaired else None
+    decisions = oracle.n_stage + oracle.n_refine + oracle.n_continue
+    return _metrics("hierarch-stage-union-nocap", decisions=decisions, judgments=oracle.judgments,
+                    relaxed=len(relaxed), pruned=pruned, excess=excess,
+                    commits=oracle.n_stage, backtracks=0,
+                    timed_out=(oracle.result == "timeout"), elapsed=elapsed, repaired=repaired)
 
 
 def run_premature_commit_nocap(root, hard, S, seed=0, time_budget=600.0):
@@ -802,6 +985,9 @@ METHODS = {
     "hierarch-commit-nocap-baseline": run_hierarch_commit_nocap_baseline,
     "hierarch-premature-commit-nocap": run_premature_commit_nocap,
     "hierarch-commit-nocap-eager": run_hierarch_commit_nocap_eager,
+    "hierarch-premature-commit-nocap-eager": run_premature_commit_nocap_eager,  # Q1 incremental
+    "hierarch-premature-commit-nocap-eager-baseline": run_premature_commit_nocap_eager_baseline,  # Q1 baseline
+    "hierarch-stage-union-nocap": run_stage_union_nocap,                        # Q3 (excess reported)
     "hierarch-portfolio": run_portfolio,                     # base -> premature -> random, budget/3 each
     "hierarch-portfolio-nocap": run_portfolio_nocap,         # portfolio with no round cap
     "hierarch-step-backtrack": run_step_backtrack,           # force backtrack after 50 stale branch steps

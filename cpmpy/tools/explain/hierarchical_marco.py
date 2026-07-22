@@ -627,6 +627,24 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                     else:                               # active, not in MCS -> background
                         committed_background.add(id(node))
                 continue
+            if action["action"] == "stage":
+                # stage-union (Q3): relax the single chosen primitive(s) in `relax` (leaves), and
+                # background only the active constraints OUTSIDE `keep` (the union of all known
+                # MCSes containing the staged primitive). Everything in `keep` stays free/open, so
+                # -- unlike commit, which backgrounds every non-MCS group -- partners of the staged
+                # primitive are never pruned. Less aggressive; backtracking becomes very unlikely.
+                keep_ids = {id(name_to_node[nm]) for nm in action.get("keep", [])}
+                relax_ids = {id(name_to_node[nm]) for nm in action.get("relax", [])}
+                for node in groups:
+                    if id(node) in committed_relaxed or id(node) in committed_background:
+                        continue                        # already committed earlier -- leave as-is
+                    if id(node) in relax_ids and not node.children:
+                        committed_relaxed.add(id(node))  # relax the staged primitive
+                    elif id(node) in keep_ids:
+                        pass                             # inside the union -> stays open
+                    else:
+                        committed_background.add(id(node))
+                continue
             if action["action"] == "refine":
                 new_groups = list(groups)
                 for name in action["constraints"]:
