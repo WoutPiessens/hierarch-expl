@@ -60,7 +60,7 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                         initial_level=1, return_mus=True, return_mcs=True, do_solution_hint=True,
                         round_timings=None, scripted_steps=None, log_events=None,
                         core_per_round=False, lazy_map=True, decide_step=None, deadline=None,
-                        round_cap=None):
+                        round_cap=None, direct_commit_literals=False, early_stop=None):
     """
         MARCO-style enumeration of MUSes and MCSes over a hierarchy of constraint groups.
 
@@ -296,6 +296,8 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
         i, u, d, a = ind[id(node)], up[id(node)], down[id(node)], act[id(node)]
         map_solver_inst += a.implies(u == i)
         map_solver_inst += a.implies(d == i)
+        if direct_commit_literals:
+            return       # commits are asserted directly as ind / ~ind literals -- no extra vars
         # commit links: background => ind (accepted), relaxed => ~ind (primitives only);
         # both may only be true when the node is active.
         map_solver_inst += background[id(node)].implies(i)
@@ -378,15 +380,26 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
         # (reached) node has its var pinned false, so the map solver can never spuriously set them
         # and change enumeration. With nothing committed this pins them all false -> identical to
         # the original behaviour. Unlinked nodes' vars are disconnected, so need no pin.
-        pins = []
-        for i in linked_a:
-            if i not in committed_background:
-                pins.append(~background[i])
-            if not node_by_id[i].children and i not in committed_relaxed:
-                pins.append(~relaxed[i])
-        map_solver_assump = ([part[i] for i in partitioned] + [act[id(node)] for node in groups]
-                             + [background[i] for i in committed_background]
-                             + [relaxed[i] for i in committed_relaxed] + pins)
+        if direct_commit_literals:
+            # assert the commits DIRECTLY as indicator literals: ind (background/pruned stays
+            # on) and ~ind (relaxed leaf forced off). act is already asserted for every group
+            # (committed nodes remain in `groups`), so the dedicated background/relaxed vars,
+            # their linking constraints AND the pins are all unnecessary.
+            map_solver_assump = ([part[i] for i in partitioned]
+                                 + [act[id(node)] for node in groups]
+                                 + [ind[i] for i in committed_background]
+                                 + [~ind[i] for i in committed_relaxed])
+        else:
+            pins = []
+            for i in linked_a:
+                if i not in committed_background:
+                    pins.append(~background[i])
+                if not node_by_id[i].children and i not in committed_relaxed:
+                    pins.append(~relaxed[i])
+            map_solver_assump = ([part[i] for i in partitioned]
+                                 + [act[id(node)] for node in groups]
+                                 + [background[i] for i in committed_background]
+                                 + [relaxed[i] for i in committed_relaxed] + pins)
 
         # state key = the assumption signature asserted this round (act/part/relaxed/background)
         state_key = (frozenset(id(node) for node in groups), frozenset(partitioned),
@@ -511,6 +524,19 @@ def hierarchical_marco(root, hard=[], solver="ortools", map_solver="ortools",
                     known_keys.add(rkey)
                     state_known.append(rec)
                     round_results.append(rec)
+                    # early-stop hook: let the driver act on a conflict THE MOMENT it is
+                    # discovered, without exhausting the (uncapped) frontier first. Used by the
+                    # eager-commit variant: stop the round as soon as a committable MCS appears,
+                    # so decide_step can commit it immediately instead of after full enumeration.
+                    if early_stop is not None and early_stop(rec):
+                        _round_capped = True
+                        if do_yield:
+                            key = (kind, frozenset(id(node) for node in found_nodes))
+                            if key not in seen:
+                                seen.add(key)
+                                yield (kind, [nd.get_grouped_constraint() for nd in found_nodes],
+                                       [nd.get_full_name() for nd in found_nodes], round_idx)
+                        break
 
             if log_events is not None:
                 log_events.append({"type": "iter", "seed": seed_names, "kind": kind,

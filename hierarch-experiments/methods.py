@@ -696,6 +696,46 @@ def run_hierarch_commit_nocap_baseline(root, hard, S, seed=0, time_budget=600.0)
                     elapsed=elapsed, repaired=repaired)
 
 
+class HierarchCommitNocapEagerOracle(HierarchCommitOracle):
+    """hierarch-commit with NO round cap, but EAGER commit: instead of enumerating the whole
+    frontier before deciding, commit a group-MCS the moment it is discovered during enumeration,
+    provided it is committable (>=1 leaf member, all members potentially suitable, in the open
+    frontier) and has not been committed/abandoned before. Realised via the enumerator's
+    `early_stop` hook, which cuts the round as soon as `_eager_ok` accepts a freshly-found MCS;
+    decide_step then commits it through the normal rule (options is non-empty by construction)."""
+
+    def _eager_ok(self, rec):
+        if rec["kind"] != "MCS":
+            return False
+        M = frozenset(rec["names"])
+        committed_active = {snap[-1] for snap in self.stack}
+        return (M not in self.abandoned_mcs and M not in committed_active
+                and any(self._is_leaf(g) for g in M)
+                and all(self._potentially_suitable(g) for g in M))
+
+
+def run_hierarch_commit_nocap_eager(root, hard, S, seed=0, time_budget=600.0):
+    oracle = HierarchCommitNocapEagerOracle(root, hard, S, seed=seed, time_budget=time_budget)
+    oracle.t0 = time.perf_counter()
+    deadline = oracle.t0 + time_budget
+    for _ in hierarchical_marco(root, list(hard), solver=SOLVER, map_solver=MAP_SOLVER,
+                                decide_step=oracle, deadline=deadline, round_cap=None,
+                                early_stop=oracle._eager_ok):
+        pass
+    elapsed = time.perf_counter() - oracle.t0
+    relaxed = set(oracle.relaxed)
+    repaired = _repaired(root, hard, relaxed)
+    if oracle.result is None:
+        oracle.result = "repaired" if repaired else "timeout"
+    pruned = sum(len(oracle.name2node[g].leaves()) for g in oracle.background)
+    decisions = (oracle.n_commit + oracle.n_refine + oracle.n_backtrack + oracle.n_restart
+                 + oracle.n_continue)
+    return _metrics("hierarch-commit-nocap-eager", decisions=decisions, judgments=oracle.judgments,
+                    relaxed=len(relaxed), pruned=pruned, commits=oracle.n_commit,
+                    backtracks=oracle.n_backtrack, timed_out=(oracle.result == "timeout"),
+                    elapsed=elapsed, repaired=repaired)
+
+
 def run_premature_commit_nocap(root, hard, S, seed=0, time_budget=600.0):
     """PREMATURE COMMIT with NO round cap: every group MUS/MCS of the current frontier is
     enumerated before the oracle decides (cf. hierarch-commit-nocap), combined with the
@@ -761,6 +801,7 @@ METHODS = {
     "hierarch-fresh-restart": run_fresh_restart,             # truly-random restart after 100 stale steps
     "hierarch-commit-nocap-baseline": run_hierarch_commit_nocap_baseline,
     "hierarch-premature-commit-nocap": run_premature_commit_nocap,
+    "hierarch-commit-nocap-eager": run_hierarch_commit_nocap_eager,
     "hierarch-portfolio": run_portfolio,                     # base -> premature -> random, budget/3 each
     "hierarch-portfolio-nocap": run_portfolio_nocap,         # portfolio with no round cap
     "hierarch-step-backtrack": run_step_backtrack,           # force backtrack after 50 stale branch steps
