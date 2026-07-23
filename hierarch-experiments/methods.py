@@ -465,6 +465,73 @@ class HierarchPrematureCommitOracle(HierarchCommitOracle):
         return None
 
 
+class HierarchLevelCommitExploreOracle(HierarchCommitOracle):
+    """LEVEL COMMIT + EXPLORE (DFS over the hierarchy). At each abstraction level: COMMIT one
+    potentially-suitable group-MCS (a leaf member is NOT required -- an all-group MCS is a
+    structural commit that focuses the branch), then EXPLORE (refine) one potentially-suitable
+    constraint group *inside* that committed MCS, drilling the branch one level finer. Repeat
+    (commit a PS MCS at the finer level, explore one of its groups) until NO potentially-suitable
+    MCS remains, then BACKTRACK the last commit and try a different PS MCS; when a level is
+    exhausted, backtrack again. Every commit is paired with exactly one co-refinement of the
+    committed MCS, and backtracking is triggered purely by 'no PS MCS left'."""
+
+    def __init__(self, root, hard, S, seed=0, time_budget=None):
+        super().__init__(root, hard, S, seed=seed, time_budget=time_budget)
+        self._explore_next = False               # set right after a commit: explore its group next
+
+    def __call__(self, ctx):
+        for r in ctx["results"]:
+            fs = frozenset(r["names"])
+            if r["kind"] == "MCS" and fs not in self.gmcs:
+                self.gmcs.append(fs)
+            elif r["kind"] == "MUS" and fs not in self.gmus:
+                self.gmus.append(fs)
+        bg = set(ctx["committed_background"])
+        rel = set(ctx["committed_relaxed"])
+        open_names = frozenset(nd.get_full_name() for nd in ctx["frontier_nodes"]
+                               if nd.get_full_name() not in rel and nd.get_full_name() not in bg)
+        self.relaxed, self.background = list(rel), bg
+        if self._initial_state is None:
+            self._initial_state = ctx["state"]
+
+        if (self.time_budget is not None and self.t0 is not None
+                and time.perf_counter() - self.t0 >= self.time_budget):
+            return self._stop("timeout")
+        if rel and self._is_repaired(rel):
+            return self._stop("repaired")
+        if not open_names:
+            return self._stop("failed")
+
+        # (A) right after a commit: explore ONE potentially-suitable group of the committed MCS
+        if self._explore_next:
+            self._explore_next = False
+            cands = sorted(g for g in self.pending
+                           if g in open_names and self.name2node[g].children
+                           and self._potentially_suitable(g))
+            if cands:
+                return self._refine(ctx, self.rng.choice(cands))
+            # else: the committed MCS had no refinable suitable group -> fall through to commit
+
+        # (B) commit one potentially-suitable MCS, then mark to explore a group of it next
+        ps = sorted(self._ps_options(open_names), key=lambda M: sorted(M))
+        if ps:
+            act = self._commit(ctx, self.rng.choice(ps), open_names)
+            self._explore_next = True
+            return act
+
+        # (C) no PS options left: backtrack the last commit; if nothing to backtrack, stop
+        if self.stack:
+            self._explore_next = False
+            return self._commit_backtrack(ctx)
+        if self._is_repaired(rel):
+            return self._stop("repaired")
+        if ctx.get("capped"):
+            self.n_continue += 1
+            self.script.append({"action": "continue"})
+            return {"action": "continue"}
+        return self._stop("failed")
+
+
 class HierarchRandomCommitOracle(HierarchCommitOracle):
     """hierarch-commit + RANDOM COMMIT: once the open frontier grows beyond FRONTIER_CAP groups,
     commit a RANDOM potentially-suitable group-MCS (even if there are several, and even if none is
@@ -598,6 +665,14 @@ def run_premature_commit(root, hard, S, seed=0, time_budget=600.0):
     return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
                                oracle_cls=HierarchPrematureCommitOracle,
                                method="hierarch-premature-commit")
+
+
+def run_level_commit_explore(root, hard, S, seed=0, time_budget=600.0):
+    """DFS strategy: commit a potentially-suitable MCS, explore one of its groups, repeat until no
+    PS MCS remains, then backtrack. Full (nocap) enumeration so all PS MCSes are known each level."""
+    return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                               round_cap=None, oracle_cls=HierarchLevelCommitExploreOracle,
+                               method="hierarch-level-commit-explore")
 
 
 def run_random_commit(root, hard, S, seed=0, time_budget=600.0):
@@ -1027,6 +1102,7 @@ METHODS = {
     "hierarch-stage-union-nocap": run_stage_union_nocap,                        # Q3 (excess reported)
     "hierarch-stage-union-nocap-eager": run_stage_union_nocap_eager,            # Q3 eager
     "hierarch-stage-union-cap5": run_stage_union_cap5,                          # Q3 round_cap=5
+    "hierarch-level-commit-explore": run_level_commit_explore,                  # commit+explore DFS
     "hierarch-portfolio": run_portfolio,                     # base -> premature -> random, budget/3 each
     "hierarch-portfolio-nocap": run_portfolio_nocap,         # portfolio with no round cap
     "hierarch-step-backtrack": run_step_backtrack,           # force backtrack after 50 stale branch steps
