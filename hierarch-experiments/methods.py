@@ -828,6 +828,15 @@ class HierarchStageUnionOracle(HierarchCommitOracle):
         union covers the most, and relaxing it makes the most progress), tie-broken by name."""
         return max(stageable, key=lambda q: len(self._mcses_through(q)))  # stageable is name-sorted
 
+    def _eager_ok(self, rec):
+        """early_stop predicate for the eager stage-union variant: cut the round the moment an MCS
+        containing a SUITABLE LEAF primitive is found -- that is exactly when a stage becomes
+        possible (a leaf in S occurs in a conflict), so decide_step can stage it immediately
+        instead of enumerating the whole frontier first."""
+        if rec["kind"] != "MCS":
+            return False
+        return any(self._is_leaf(g) and g in self.S for g in rec["names"])
+
     def __call__(self, ctx):
         for r in ctx["results"]:
             fs = frozenset(r["names"])
@@ -896,14 +905,23 @@ class HierarchStageUnionOracle(HierarchCommitOracle):
         return {"action": "stage", "relax": [p], "keep": sorted(keep)}
 
 
-def run_stage_union_nocap(root, hard, S, seed=0, time_budget=600.0):
-    """Q3: stage-union with deferred (nocap) enumeration. Reports `excess` = final relaxed size
-    minus a greedily minimised correction subset (this method does NOT guarantee minimality)."""
+def _run_stage_union(method, root, hard, S, seed, time_budget, round_cap=None, eager=False):
+    """Drive stage-union to completion and return its metrics (incl. excess over a greedily
+    minimised repair). `round_cap`/`eager` control WHEN the oracle acts relative to enumeration:
+      * round_cap=None, eager=False : deferred -- full frontier enumerated before each decision;
+        U(p) is the union of ALL MCSes through p, so pruning is safe (never backtracks).
+      * round_cap=k                 : act after at most k conflicts per round.
+      * eager=True                  : act the moment a stageable MCS appears (early_stop).
+    Under a cap or eager, U(p) is the union of the MCSes KNOWN SO FAR, so pruning may drop a
+    not-yet-seen partner -- stage-union has no backtracking, so that surfaces as a dead-end
+    (lower repair rate) traded for earlier action."""
     oracle = HierarchStageUnionOracle(root, hard, S, seed=seed, time_budget=time_budget)
     oracle.t0 = time.perf_counter()
     deadline = oracle.t0 + time_budget
+    es = oracle._eager_ok if eager else None
     for _ in hierarchical_marco(root, list(hard), solver=SOLVER, map_solver=MAP_SOLVER,
-                                decide_step=oracle, deadline=deadline, round_cap=None):
+                                decide_step=oracle, deadline=deadline, round_cap=round_cap,
+                                early_stop=es):
         pass
     elapsed = time.perf_counter() - oracle.t0
     relaxed = set(oracle.relaxed)
@@ -913,10 +931,29 @@ def run_stage_union_nocap(root, hard, S, seed=0, time_budget=600.0):
     pruned = sum(len(oracle.name2node[g].leaves()) for g in oracle.background)
     excess = (len(relaxed) - _greedy_minimal(root, hard, relaxed)) if repaired else None
     decisions = oracle.n_stage + oracle.n_refine + oracle.n_continue
-    return _metrics("hierarch-stage-union-nocap", decisions=decisions, judgments=oracle.judgments,
+    return _metrics(method, decisions=decisions, judgments=oracle.judgments,
                     relaxed=len(relaxed), pruned=pruned, excess=excess,
-                    commits=oracle.n_stage, backtracks=0,
+                    commits=oracle.n_stage, backtracks=oracle.n_backtrack,
                     timed_out=(oracle.result == "timeout"), elapsed=elapsed, repaired=repaired)
+
+
+def run_stage_union_nocap(root, hard, S, seed=0, time_budget=600.0):
+    """Q3: stage-union, deferred (full) nocap enumeration. Reports `excess` = final relaxed size
+    minus a greedily minimised correction subset (this method does NOT guarantee minimality)."""
+    return _run_stage_union("hierarch-stage-union-nocap", root, hard, S, seed, time_budget)
+
+
+def run_stage_union_nocap_eager(root, hard, S, seed=0, time_budget=600.0):
+    """Q3 variant: stage-union with EAGER staging -- act the moment a stageable MCS is discovered
+    (early_stop), so U(p) is built from the MCSes known so far rather than the full frontier."""
+    return _run_stage_union("hierarch-stage-union-nocap-eager", root, hard, S, seed, time_budget,
+                            eager=True)
+
+
+def run_stage_union_cap5(root, hard, S, seed=0, time_budget=600.0):
+    """Q3 variant: stage-union with a per-round cap of 5 conflicts (act after seeing <=5)."""
+    return _run_stage_union("hierarch-stage-union-cap5", root, hard, S, seed, time_budget,
+                            round_cap=5)
 
 
 def run_premature_commit_nocap(root, hard, S, seed=0, time_budget=600.0):
@@ -988,6 +1025,8 @@ METHODS = {
     "hierarch-premature-commit-nocap-eager": run_premature_commit_nocap_eager,  # Q1 incremental
     "hierarch-premature-commit-nocap-eager-baseline": run_premature_commit_nocap_eager_baseline,  # Q1 baseline
     "hierarch-stage-union-nocap": run_stage_union_nocap,                        # Q3 (excess reported)
+    "hierarch-stage-union-nocap-eager": run_stage_union_nocap_eager,            # Q3 eager
+    "hierarch-stage-union-cap5": run_stage_union_cap5,                          # Q3 round_cap=5
     "hierarch-portfolio": run_portfolio,                     # base -> premature -> random, budget/3 each
     "hierarch-portfolio-nocap": run_portfolio_nocap,         # portfolio with no round cap
     "hierarch-step-backtrack": run_step_backtrack,           # force backtrack after 50 stale branch steps
