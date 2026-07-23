@@ -481,6 +481,17 @@ class HierarchLevelCommitExploreOracle(HierarchCommitOracle):
         super().__init__(root, hard, S, seed=seed, time_budget=time_budget)
         self._explore_next = False               # set right after a commit: explore its group next
 
+    def _eager_ok(self, rec):
+        """eager commit: cut the round the moment a POTENTIALLY-SUITABLE MCS appears (every member
+        holds an S-leaf; a leaf member is NOT required -- matches this oracle's commit rule), not
+        already committed on the branch or abandoned. decide_step then commits it via rule (B)."""
+        if rec["kind"] != "MCS":
+            return False
+        M = frozenset(rec["names"])
+        committed_active = {snap[-1] for snap in self.stack}
+        return (M not in self.abandoned_mcs and M not in committed_active
+                and all(self._potentially_suitable(g) for g in M))
+
     def __call__(self, ctx):
         for r in ctx["results"]:
             fs = frozenset(r["names"])
@@ -637,7 +648,7 @@ class HierarchStepBacktrackOracle(HierarchCommitOracle):
 
 
 def run_hierarch_commit(root, hard, S, seed=0, time_budget=600.0, round_cap=ROUND_CAP,
-                        method="hierarch-commit", oracle_cls=HierarchCommitOracle):
+                        method="hierarch-commit", oracle_cls=HierarchCommitOracle, eager=False):
     """Drive ``hierarchical_marco`` with :class:`HierarchCommitOracle` (no frontier bound, no
     explore-backtrack), verify the resulting relaxation, and return the metrics.
 
@@ -651,8 +662,10 @@ def run_hierarch_commit(root, hard, S, seed=0, time_budget=600.0, round_cap=ROUN
     oracle = oracle_cls(root, hard, S, seed=seed, time_budget=time_budget)
     oracle.t0 = time.perf_counter()
     deadline = oracle.t0 + time_budget if time_budget is not None else None
+    es = oracle._eager_ok if eager else None       # eager: commit the first committable MCS found
     for _ in hierarchical_marco(root, list(hard), solver=SOLVER, map_solver=MAP_SOLVER,
-                                decide_step=oracle, deadline=deadline, round_cap=round_cap):
+                                decide_step=oracle, deadline=deadline, round_cap=round_cap,
+                                early_stop=es):
         pass
     elapsed = time.perf_counter() - oracle.t0
     relaxed = set(oracle.relaxed)
@@ -702,6 +715,14 @@ def run_level_commit_explore_complete(root, hard, S, seed=0, time_budget=600.0):
     return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
                                round_cap=None, oracle_cls=HierarchLevelCommitExploreCompleteOracle,
                                method="hierarch-level-commit-explore-complete")
+
+
+def run_level_commit_explore_complete_eager(root, hard, S, seed=0, time_budget=600.0):
+    """`hierarch-level-commit-explore-complete` with EAGER commit: commit a potentially-suitable
+    MCS the moment it is found during enumeration (early_stop), rather than after the full round."""
+    return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget, round_cap=None,
+                               oracle_cls=HierarchLevelCommitExploreCompleteOracle, eager=True,
+                               method="hierarch-level-commit-explore-complete-eager")
 
 
 def run_random_commit(root, hard, S, seed=0, time_budget=600.0):
@@ -1133,6 +1154,7 @@ METHODS = {
     "hierarch-stage-union-cap5": run_stage_union_cap5,                          # Q3 round_cap=5
     "hierarch-level-commit-explore": run_level_commit_explore,                  # commit+explore DFS
     "hierarch-level-commit-explore-complete": run_level_commit_explore_complete,  # + completeness safeguard
+    "hierarch-level-commit-explore-complete-eager": run_level_commit_explore_complete_eager,  # + eager commit
     "hierarch-portfolio": run_portfolio,                     # base -> premature -> random, budget/3 each
     "hierarch-portfolio-nocap": run_portfolio_nocap,         # portfolio with no round cap
     "hierarch-step-backtrack": run_step_backtrack,           # force backtrack after 50 stale branch steps

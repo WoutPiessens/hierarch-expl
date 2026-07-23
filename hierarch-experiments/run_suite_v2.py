@@ -26,14 +26,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--methods", nargs="+", default=ALL7)
+    ap.add_argument("--scheme", default="mss-20")
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--budget", type=float, default=600.0)
     args = ap.parse_args()
 
-    cells = [(p, i, "mss-20", o["seed"], m)
+    cells = [(p, i, args.scheme, o["seed"], m)
              for p in ("nurse-suite", "thesis-suite", "workforce-suite")
              for i in hierarchy.list_instances(p)
-             for o in orc.load_oracles(p, i, "mss-20")
+             for o in orc.load_oracles(p, i, args.scheme)
              for m in args.methods]
 
     out = Path(args.out)

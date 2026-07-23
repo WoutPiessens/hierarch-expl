@@ -73,6 +73,41 @@ def _random_oracle(root, hard, k, rng):
     return set(rng.sample(names, k))
 
 
+# ------------------------------------------------ hierarchy-friendly node sampling ---
+def hiernode_oracle(root, hard, rng):
+    """HIERARCHY-FRIENDLY sampling: randomly select nodes (subtrees) from the constraint hierarchy,
+    adding each selected node's whole leaf-set to S, UNTIL removing S restores satisfiability. S is
+    thus a union of whole subtrees -- cleanly aligned with the hierarchy the commit methods refine
+    over (a sampled group is entirely suitable, so it can be committed as one unit). Returns
+    ``(S, picked_node_names)``. Feasible by construction (in the limit S is all leaves, trivially
+    feasible).
+
+    Prefix-union feasibility is MONOTONIC in the shuffled prefix length (adding subtrees only
+    relaxes more, never re-breaks SAT), so we binary-search the smallest feasible prefix instead of
+    testing after every node -- O(log n) feasibility solves rather than O(n)."""
+    nodes = [nd for nd in root.iter_nodes() if nd.parent is not None]     # every node except root
+    order = list(range(len(nodes)))
+    rng.shuffle(order)
+    leafsets = [{lf.get_full_name() for lf in nodes[i].leaves()} for i in order]
+
+    def union_upto(length):
+        S = set()
+        for j in range(length):
+            S |= leafsets[j]
+        return S
+
+    lo, hi = 1, len(order)                       # smallest feasible prefix length in [lo, hi]
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if _feasible(root, hard, union_upto(mid)):
+            hi = mid
+        else:
+            lo = mid + 1
+    S = union_upto(hi)
+    picked = [nodes[order[j]].get_full_name() for j in range(hi)]
+    return S, picked
+
+
 # ---------------------------------------------------------------- public API ---
 def sample_oracles(root, hard, scheme, pct, n, seed0=0, max_tries=500_000,
                    escalate_step=10, escalate_after=2000, max_pct=100, verbose=True):

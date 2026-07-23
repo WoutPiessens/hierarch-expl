@@ -13,6 +13,8 @@ from hierarchy import instance_dir
 SCHEMES = {
     "mss-20":    {"pct": 20, "n": 20, "file": "oracles_mss20.json"},
     "random-40": {"pct": 40, "n": 20, "file": "oracles_random40.json"},
+    # hierarchy-friendly: S = union of randomly-selected whole subtrees, grown until feasible
+    "hiernode":  {"pct": None, "n": 20, "file": "oracles_hiernode.json"},
 }
 
 
