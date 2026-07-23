@@ -476,10 +476,19 @@ class HierarchLevelCommitExploreOracle(HierarchCommitOracle):
     committed MCS, and backtracking is triggered purely by 'no PS MCS left'."""
 
     _complete = False                            # completeness safeguard off in the base variant
+    _refine_on_backtrack = False                 # btrefine variant: refine a PS group after backtrack
 
     def __init__(self, root, hard, S, seed=0, time_budget=None):
         super().__init__(root, hard, S, seed=seed, time_budget=time_budget)
         self._explore_next = False               # set right after a commit: explore its group next
+        self._refine_pending = False             # set by a backtrack in the btrefine variant
+
+    def _commit_backtrack(self, ctx):
+        act = super()._commit_backtrack(ctx)
+        self._explore_next = False
+        if self._refine_on_backtrack:            # btrefine: force a refine on the next round
+            self._refine_pending = True
+        return act
 
     def _eager_ok(self, rec):
         """eager commit: cut the round the moment a POTENTIALLY-SUITABLE MCS appears (every member
@@ -514,6 +523,20 @@ class HierarchLevelCommitExploreOracle(HierarchCommitOracle):
             return self._stop("repaired")
         if not open_names:
             return self._stop("failed")
+
+        # (A0) btrefine variant: right after a backtrack, refine a potentially-suitable group
+        # (relevant ones -- those occurring in a known conflict -- first) BEFORE committing again,
+        # so the search drills the restored branch finer instead of immediately re-committing.
+        if self._refine_pending:
+            self._refine_pending = False
+            relevant = set().union(*self.gmcs, *self.gmus) if (self.gmcs or self.gmus) else set()
+            cands = sorted(g for g in open_names if g in relevant
+                           and self.name2node[g].children and self._potentially_suitable(g)) \
+                or sorted(g for g in open_names
+                          if self.name2node[g].children and self._potentially_suitable(g))
+            if cands:
+                self._explore_next = False
+                return self._refine(ctx, self.rng.choice(cands))
 
         # (A) right after a commit: explore ONE potentially-suitable group of the committed MCS
         if self._explore_next:
@@ -562,6 +585,14 @@ class HierarchLevelCommitExploreCompleteOracle(HierarchLevelCommitExploreOracle)
     potentially-suitable group instead of giving up, then re-runs the DFS on the finer frontier."""
 
     _complete = True
+
+
+class HierarchLevelCommitExploreBtrefineOracle(HierarchLevelCommitExploreCompleteOracle):
+    """Complete level-commit-explore that, after EVERY backtrack, refines a potentially-suitable
+    group (relevant ones first) before committing again -- so a backtracked branch is drilled
+    finer rather than immediately retried with a sibling MCS at the same abstraction level."""
+
+    _refine_on_backtrack = True
 
 
 class HierarchRandomCommitOracle(HierarchCommitOracle):
@@ -723,6 +754,14 @@ def run_level_commit_explore_complete_eager(root, hard, S, seed=0, time_budget=6
     return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget, round_cap=None,
                                oracle_cls=HierarchLevelCommitExploreCompleteOracle, eager=True,
                                method="hierarch-level-commit-explore-complete-eager")
+
+
+def run_level_commit_explore_btrefine(root, hard, S, seed=0, time_budget=600.0):
+    """Complete level-commit-explore that refines a potentially-suitable group after every
+    backtrack (vs the base variant, which re-commits a sibling MCS at the same level)."""
+    return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget, round_cap=None,
+                               oracle_cls=HierarchLevelCommitExploreBtrefineOracle,
+                               method="hierarch-level-commit-explore-btrefine")
 
 
 def run_random_commit(root, hard, S, seed=0, time_budget=600.0):
@@ -1155,6 +1194,7 @@ METHODS = {
     "hierarch-level-commit-explore": run_level_commit_explore,                  # commit+explore DFS
     "hierarch-level-commit-explore-complete": run_level_commit_explore_complete,  # + completeness safeguard
     "hierarch-level-commit-explore-complete-eager": run_level_commit_explore_complete_eager,  # + eager commit
+    "hierarch-level-commit-explore-btrefine": run_level_commit_explore_btrefine,  # refine-after-backtrack
     "hierarch-portfolio": run_portfolio,                     # base -> premature -> random, budget/3 each
     "hierarch-portfolio-nocap": run_portfolio_nocap,         # portfolio with no round cap
     "hierarch-step-backtrack": run_step_backtrack,           # force backtrack after 50 stale branch steps
