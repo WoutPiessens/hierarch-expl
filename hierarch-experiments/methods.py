@@ -475,6 +475,8 @@ class HierarchLevelCommitExploreOracle(HierarchCommitOracle):
     exhausted, backtrack again. Every commit is paired with exactly one co-refinement of the
     committed MCS, and backtracking is triggered purely by 'no PS MCS left'."""
 
+    _complete = False                            # completeness safeguard off in the base variant
+
     def __init__(self, root, hard, S, seed=0, time_budget=None):
         super().__init__(root, hard, S, seed=seed, time_budget=time_budget)
         self._explore_next = False               # set right after a commit: explore its group next
@@ -519,17 +521,36 @@ class HierarchLevelCommitExploreOracle(HierarchCommitOracle):
             self._explore_next = True
             return act
 
-        # (C) no PS options left: backtrack the last commit; if nothing to backtrack, stop
+        # (C) no PS options left: backtrack the last commit if possible
         if self.stack:
             self._explore_next = False
             return self._commit_backtrack(ctx)
         if self._is_repaired(rel):
             return self._stop("repaired")
+        # COMPLETENESS SAFEGUARD (complete variant only): at the highest level of abstraction
+        # (empty stack -- backtracking here would abandon the problem) with no PS MCS left, instead
+        # of failing, refine a RANDOM potentially-suitable group and resume the DFS on the finer
+        # frontier. Refinement exposes new, finer MCSes (new indicator vars -> new conflicts), so
+        # fresh PS options appear; it is bounded (a group can be refined only down to its leaves).
+        if self._complete:
+            refinable = sorted(g for g in open_names
+                               if self.name2node[g].children and self._potentially_suitable(g))
+            if refinable:
+                self._explore_next = False
+                return self._refine(ctx, self.rng.choice(refinable))
         if ctx.get("capped"):
             self.n_continue += 1
             self.script.append({"action": "continue"})
             return {"action": "continue"}
         return self._stop("failed")
+
+
+class HierarchLevelCommitExploreCompleteOracle(HierarchLevelCommitExploreOracle):
+    """`HierarchLevelCommitExploreOracle` + COMPLETENESS SAFEGUARD: when the DFS exhausts every
+    potentially-suitable MCS at the highest abstraction level (empty stack), it refines a random
+    potentially-suitable group instead of giving up, then re-runs the DFS on the finer frontier."""
+
+    _complete = True
 
 
 class HierarchRandomCommitOracle(HierarchCommitOracle):
@@ -673,6 +694,14 @@ def run_level_commit_explore(root, hard, S, seed=0, time_budget=600.0):
     return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
                                round_cap=None, oracle_cls=HierarchLevelCommitExploreOracle,
                                method="hierarch-level-commit-explore")
+
+
+def run_level_commit_explore_complete(root, hard, S, seed=0, time_budget=600.0):
+    """`hierarch-level-commit-explore` with the completeness safeguard: on top-level exhaustion,
+    refine a random potentially-suitable group and re-run the DFS instead of abandoning."""
+    return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                               round_cap=None, oracle_cls=HierarchLevelCommitExploreCompleteOracle,
+                               method="hierarch-level-commit-explore-complete")
 
 
 def run_random_commit(root, hard, S, seed=0, time_budget=600.0):
@@ -1103,6 +1132,7 @@ METHODS = {
     "hierarch-stage-union-nocap-eager": run_stage_union_nocap_eager,            # Q3 eager
     "hierarch-stage-union-cap5": run_stage_union_cap5,                          # Q3 round_cap=5
     "hierarch-level-commit-explore": run_level_commit_explore,                  # commit+explore DFS
+    "hierarch-level-commit-explore-complete": run_level_commit_explore_complete,  # + completeness safeguard
     "hierarch-portfolio": run_portfolio,                     # base -> premature -> random, budget/3 each
     "hierarch-portfolio-nocap": run_portfolio_nocap,         # portfolio with no round cap
     "hierarch-step-backtrack": run_step_backtrack,           # force backtrack after 50 stale branch steps
