@@ -259,9 +259,22 @@ class HierarchCommitOracle:
             node = node.parent
         return False
 
+    # random perturbation probabilities (0 = off); set by the *-explore5/-backtrack5/-both5 variants
+    _p_explore = 0.0
+    _p_backtrack = 0.0
+
     # --- variant hooks (no-ops in the base policy; overridden by the variant subclasses) ---
     def _pre_commit_action(self, ctx, open_names, rel):
-        """Chance to act BEFORE the commit/refine rules (forced explore, fresh restart, ...)."""
+        """Chance to act BEFORE the commit/refine rules. Base policy: with probability _p_backtrack
+        do a random backtrack, and/or with probability _p_explore refine a random potentially-
+        suitable group -- both no-ops when the probabilities are 0 (the default)."""
+        if self._p_backtrack and self.stack and self.rng.random() < self._p_backtrack:
+            return self._commit_backtrack(ctx)
+        if self._p_explore and self.rng.random() < self._p_explore:
+            cands = sorted(g for g in open_names
+                           if self.name2node[g].children and self._potentially_suitable(g))
+            if cands:
+                return self._refine(ctx, self.rng.choice(cands))
         return None
 
     def _alt_commit_action(self, ctx, open_names):
@@ -1174,6 +1187,29 @@ def run_step_backtrack_nocap(root, hard, S, seed=0, time_budget=600.0):
                                method="hierarch-step-backtrack-nocap")
 
 
+def make_perturbed(name, base_cls, *, round_cap, eager=False, p_explore=0.0, p_backtrack=0.0):
+    """Runner for a commit oracle with a per-round 5%-style random explore / backtrack perturbation
+    (p_explore / p_backtrack). `base_cls`+round_cap+eager select the underlying policy (eager nocap
+    commit, or capped commit)."""
+    cls = type(f"Perturbed_{name}", (base_cls,),
+               {"_p_explore": p_explore, "_p_backtrack": p_backtrack})
+
+    def runner(root, hard, S, seed=0, time_budget=600.0):
+        return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                                   round_cap=round_cap, oracle_cls=cls, eager=eager, method=name)
+    return runner
+
+
+def make_capped_commit(cap):
+    """Plain commit at a given per-round conflict cap (no perturbation)."""
+    name = f"hierarch-commit-cap{cap}"
+
+    def runner(root, hard, S, seed=0, time_budget=600.0):
+        return run_hierarch_commit(root, hard, S, seed=seed, time_budget=time_budget,
+                                   round_cap=cap, oracle_cls=HierarchCommitOracle, method=name)
+    return runner
+
+
 METHODS = {
     "mcs-enumeration": run_baseline,
     "selective-relaxation": run_selective_relaxation,
@@ -1217,3 +1253,15 @@ def make_step_backtrack(cap):
 # cap-sweep variants (ub50 is the plain hierarch-step-backtrack above)
 for _cap in (10, 20, 100, 200, 500):
     METHODS[f"hierarch-step-backtrack-ub{_cap}"] = make_step_backtrack(_cap)
+
+# --- 5%-perturbation variants: commit-nocap-eager and commit-cap20, each +explore / +backtrack /
+#     +both; plus plain commit at caps 10 and 50 (no other changes) ---
+for _tag, _pe, _pb in (("explore5", 0.05, 0.0), ("backtrack5", 0.0, 0.05), ("both5", 0.05, 0.05)):
+    _n = f"hierarch-commit-nocap-eager-{_tag}"
+    METHODS[_n] = make_perturbed(_n, HierarchCommitNocapEagerOracle, round_cap=None, eager=True,
+                                 p_explore=_pe, p_backtrack=_pb)
+    _n = f"hierarch-commit-cap20-{_tag}"
+    METHODS[_n] = make_perturbed(_n, HierarchCommitOracle, round_cap=20,
+                                 p_explore=_pe, p_backtrack=_pb)
+for _cap in (10, 50):
+    METHODS[f"hierarch-commit-cap{_cap}"] = make_capped_commit(_cap)
