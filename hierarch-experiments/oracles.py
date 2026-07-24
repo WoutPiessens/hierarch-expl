@@ -15,6 +15,8 @@ SCHEMES = {
     "random-40": {"pct": 40, "n": 20, "file": "oracles_random40.json"},
     # hierarchy-friendly: S = union of randomly-selected whole subtrees, grown until feasible
     "hiernode":  {"pct": None, "n": 20, "file": "oracles_hiernode.json"},
+    # graded: S = a natural minimal correction, stratified by size (minimal-MCS) into difficulty bins
+    "graded":    {"pct": None, "n": None, "file": "oracles_graded.json"},
 }
 
 
