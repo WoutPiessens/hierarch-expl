@@ -115,9 +115,8 @@ def main():
     ap.add_argument("--workers", type=int, default=9)
     args = ap.parse_args()
 
-    global CLASSES
-    CLASSES = tuple(args.classes)
-    jobs = [(p, i) for p in CLASSES for i in hierarchy.list_instances(p)]
+    classes = tuple(args.classes)
+    jobs = [(p, i) for p in classes for i in hierarchy.list_instances(p)]
     pools = {}                                              # (problem, inst) -> {bin: [S,...]}
     with ProcessPoolExecutor(max_workers=args.workers) as ex:
         futs = [ex.submit(pool_instance, p, i, args.maxseed, args.cap, args.pad) for p, i in jobs]
@@ -130,7 +129,7 @@ def main():
     # ---- per-class balancing: fill each bin up to target, round-robin across instances ----
     selected = defaultdict(list)                            # (problem, inst) -> list of oracle dicts
     summary = {}
-    for problem in CLASSES:
+    for problem in classes:
         insts = hierarchy.list_instances(problem)
         summary[problem] = {}
         for b in range(len(BINS)):
@@ -157,7 +156,7 @@ def main():
 
     print("\n=== per-class bin totals (target %d/bin) ===" % args.target)
     print(f"{'class':16} " + "  ".join(f"{b:>7}" for b in BLAB))
-    for problem in CLASSES:
+    for problem in classes:
         print(f"{problem:16} " + "  ".join(f"{summary[problem][b]:>7}" for b in BLAB))
     Path("graded_summary.json").write_text(json.dumps(summary, indent=2))
     print("GEN_GRADED_DONE", flush=True)
