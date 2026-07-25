@@ -1263,5 +1263,5 @@ for _tag, _pe, _pb in (("explore5", 0.05, 0.0), ("backtrack5", 0.0, 0.05), ("bot
     _n = f"hierarch-commit-cap20-{_tag}"
     METHODS[_n] = make_perturbed(_n, HierarchCommitOracle, round_cap=20,
                                  p_explore=_pe, p_backtrack=_pb)
-for _cap in (10, 50):
+for _cap in (10, 50, 100, 200):
     METHODS[f"hierarch-commit-cap{_cap}"] = make_capped_commit(_cap)
