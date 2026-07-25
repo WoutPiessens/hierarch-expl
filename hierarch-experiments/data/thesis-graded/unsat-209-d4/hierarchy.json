@@ -1,0 +1,1859 @@
+{
+  "name": "root",
+  "constraints": [],
+  "children": [
+    {
+      "name": "person-unavailable",
+      "constraints": [],
+      "children": [
+        {
+          "name": "Danny Hughes",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-24",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10282
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10283
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10284
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10285
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10286
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-25",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10287
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10288
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10289
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10290
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10291
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10292
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10293
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10294
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10295
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-27",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10296
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-28",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10297
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10298
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Sam Michiels",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-24",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10299
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10300
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10301
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10302
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10303
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10304
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-25",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10305
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10306
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10307
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10308
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10309
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10310
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10311
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10312
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10313
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10314
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10315
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10316
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-27",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10317
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10318
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10319
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10320
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10321
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10322
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10323
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10324
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-28",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10325
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10326
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10327
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10328
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10329
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Shuaibu Musa Adam",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-24",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10330
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10331
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10332
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10333
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-25",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10334
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10335
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10336
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10337
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10338
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10339
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10340
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10341
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10342
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10343
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10344
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-27",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10345
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10346
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10347
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-28",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10348
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10349
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10350
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10351
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10352
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Van Vu Bui",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-24",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10353
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10354
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10355
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10356
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10357
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10358
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-25",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10359
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10360
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10361
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10362
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10363
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10364
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10365
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10366
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10367
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-27",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10368
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10369
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10370
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10371
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10372
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10373
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10374
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10375
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-28",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10376
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10377
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10378
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10379
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10380
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10381
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10382
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "room-unavailable",
+      "constraints": [],
+      "children": [
+        {
+          "name": "200C 00.01",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-24",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10383
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10384
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10385
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10386
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10387
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-27",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10388
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-28",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10389
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10390
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "200C 00.02",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-25",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10391
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10392
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10393
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10394
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10395
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10396
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10397
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10398
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10399
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-27",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10400
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10401
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-28",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10402
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10403
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10404
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10405
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "200C 00.03",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10406
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-28",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10407
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10408
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10409
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "200C 00.04",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-25",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10410
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10411
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10412
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10413
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10414
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10415
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10416
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-27",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10417
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10418
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "200B 01.14",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-24",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10419
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10420
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10421
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10422
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10423
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10424
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10425
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10426
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10427
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "200B 01.16",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-24",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10428
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-25",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10429
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10430
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10431
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10432
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10433
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10434
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10435
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10436
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10437
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10438
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10439
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-28",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10440
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "200B 01.18",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-25",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10441
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10442
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10443
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10444
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10445
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10446
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-28",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10447
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10448
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Ruby",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-27",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10449
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10450
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10451
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10452
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10453
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10454
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10455
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-28",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10456
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10457
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "11:00:00",
+                  "constraints": [
+                    10458
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "12:00:00",
+                  "constraints": [
+                    10459
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "13:00:00",
+                  "constraints": [
+                    10460
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10461
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Python",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-24",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10462
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10463
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10464
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "16:00:00",
+                  "constraints": [
+                    10465
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-28",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "15:00:00",
+                  "constraints": [
+                    10466
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Java",
+          "constraints": [],
+          "children": [
+            {
+              "name": "2025-02-26",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "14:00:00",
+                  "constraints": [
+                    10467
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "2025-02-27",
+              "constraints": [],
+              "children": [
+                {
+                  "name": "09:00:00",
+                  "constraints": [
+                    10468
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "10:00:00",
+                  "constraints": [
+                    10469
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "already-allocated",
+      "constraints": [],
+      "children": [
+        {
+          "name": "0",
+          "constraints": [
+            10470
+          ],
+          "children": []
+        },
+        {
+          "name": "1",
+          "constraints": [
+            10471
+          ],
+          "children": []
+        },
+        {
+          "name": "2",
+          "constraints": [
+            10472
+          ],
+          "children": []
+        },
+        {
+          "name": "3",
+          "constraints": [
+            10473
+          ],
+          "children": []
+        },
+        {
+          "name": "5",
+          "constraints": [
+            10474
+          ],
+          "children": []
+        },
+        {
+          "name": "6",
+          "constraints": [
+            10475
+          ],
+          "children": []
+        },
+        {
+          "name": "7",
+          "constraints": [
+            10476
+          ],
+          "children": []
+        },
+        {
+          "name": "8",
+          "constraints": [
+            10477
+          ],
+          "children": []
+        },
+        {
+          "name": "9",
+          "constraints": [
+            10478
+          ],
+          "children": []
+        },
+        {
+          "name": "11",
+          "constraints": [
+            10479
+          ],
+          "children": []
+        },
+        {
+          "name": "12",
+          "constraints": [
+            10480
+          ],
+          "children": []
+        },
+        {
+          "name": "13",
+          "constraints": [
+            10481
+          ],
+          "children": []
+        },
+        {
+          "name": "14",
+          "constraints": [
+            10482
+          ],
+          "children": []
+        },
+        {
+          "name": "15",
+          "constraints": [
+            10483
+          ],
+          "children": []
+        },
+        {
+          "name": "16",
+          "constraints": [
+            10484
+          ],
+          "children": []
+        },
+        {
+          "name": "17",
+          "constraints": [
+            10485
+          ],
+          "children": []
+        },
+        {
+          "name": "18",
+          "constraints": [
+            10486
+          ],
+          "children": []
+        },
+        {
+          "name": "19",
+          "constraints": [
+            10487
+          ],
+          "children": []
+        },
+        {
+          "name": "20",
+          "constraints": [
+            10488
+          ],
+          "children": []
+        },
+        {
+          "name": "21",
+          "constraints": [
+            10489
+          ],
+          "children": []
+        },
+        {
+          "name": "22",
+          "constraints": [
+            10490
+          ],
+          "children": []
+        }
+      ]
+    }
+  ]
+}

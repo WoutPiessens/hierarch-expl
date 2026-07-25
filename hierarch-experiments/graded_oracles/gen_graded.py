@@ -112,6 +112,7 @@ def main():
     ap.add_argument("--target", type=int, default=30)       # per bin per CLASS in the final set
     ap.add_argument("--pad", type=float, default=0.20)      # pad S to this fraction with distractors (0=off)
     ap.add_argument("--classes", nargs="+", default=list(CLASSES))
+    ap.add_argument("--pool-out", default=None, help="dump raw pools to this JSON and skip selection")
     ap.add_argument("--workers", type=int, default=9)
     args = ap.parse_args()
 
@@ -125,6 +126,14 @@ def main():
             pools[(problem, inst)] = pool
             cov = "  ".join(f"{BLAB[b]}:{len(pool[b])}" for b in range(len(BINS)))
             print(f"  pooled {problem}/{inst}   {cov}", flush=True)
+
+    if args.pool_out:
+        # dump raw pools: [{problem, inst, bin, minmcs, S}, ...] -- selection done later by the ILP
+        recs = [{"problem": p, "inst": i, "bin": BLAB[b], "minmcs": mc, "S": S}
+                for (p, i), pool in pools.items() for b in range(len(BINS)) for mc, S in pool[b]]
+        Path(args.pool_out).write_text(json.dumps(recs))
+        print(f"POOL_OUT {len(recs)} records -> {args.pool_out}\nGEN_GRADED_DONE", flush=True)
+        return
 
     # ---- per-class balancing: fill each bin up to target, round-robin across instances ----
     selected = defaultdict(list)                            # (problem, inst) -> list of oracle dicts

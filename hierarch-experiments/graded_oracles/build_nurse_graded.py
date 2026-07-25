@@ -42,9 +42,9 @@ NURSE_DIR = HERE.parent.parent / "examples" / "nurserostering"
 OUT = HERE.parent / "data" / "nurse-graded"
 # (name, source instance idx, n_nurses or None=all, horizon or None=full)
 CONFIGS = [
-    ("nurse4", 4, None, None),      # full horizon (h28) -> 16-32
-    ("nurse5", 5, None, None),      # full horizon
-    ("nurse6", 6, None, None),      # full horizon
+    ("nurse1-h13", 1, 8, 13),       # <=5 / 6-10
+    ("nurse2-h12", 2, None, 12),    # mid (6-10 / 11-15?)
+    ("nurse2-h13", 2, None, 13),    # 11-15
 ]
 
 
