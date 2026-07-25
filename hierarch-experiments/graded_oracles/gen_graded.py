@@ -111,9 +111,12 @@ def main():
     ap.add_argument("--cap", type=int, default=14)          # per bin per instance in the pool
     ap.add_argument("--target", type=int, default=30)       # per bin per CLASS in the final set
     ap.add_argument("--pad", type=float, default=0.20)      # pad S to this fraction with distractors (0=off)
+    ap.add_argument("--classes", nargs="+", default=list(CLASSES))
     ap.add_argument("--workers", type=int, default=9)
     args = ap.parse_args()
 
+    global CLASSES
+    CLASSES = tuple(args.classes)
     jobs = [(p, i) for p in CLASSES for i in hierarchy.list_instances(p)]
     pools = {}                                              # (problem, inst) -> {bin: [S,...]}
     with ProcessPoolExecutor(max_workers=args.workers) as ex:
