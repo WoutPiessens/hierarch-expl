@@ -27,15 +27,17 @@ from utils import read_instance
 
 SCEN = WF / "allocation_src" / "scenarios"
 OUT = HERE.parent / "data" / "workforce-graded2"
-# (name, scenario file, N_DROP, order-seed)
+# (name, scenario file, N_DROP or "max", order-seed) -- distinct scenarios chosen by task count
+# (more tasks -> more contention -> larger corrections) to tile the difficulty bins.
 CONFIGS = [
-    ("wf-s0-d12", "scenario_0.json", 12, 1),
-    ("wf-s5-d12", "scenario_5.json", 12, 1),
-    ("wf-s50-d12", "scenario_50.json", 12, 1),
-    ("wf-s10-d12", "scenario_10.json", 12, 1),
-    ("wf-s40-d13", "scenario_40.json", 13, 1),
-    ("wf-s17-d8", "scenario_17.json", 8, 1),
-    ("wf-s22-d8", "scenario_22.json", 8, 1),
+    ("wf-s22", "scenario_22.json", "max", 1),      # 7 tasks   -> <=5
+    ("wf-s2", "scenario_2.json", "max", 1),        # 18 tasks  -> <=5 / 6-10
+    ("wf-s25", "scenario_25.json", "max", 1),      # 46 tasks  -> 6-10 / 11-15
+    ("wf-s3", "scenario_3.json", "max", 1),        # 80 tasks  -> 11-15
+    ("wf-s0", "scenario_0.json", "max", 1),        # 105 tasks -> 16-20
+    ("wf-s50", "scenario_50.json", "max", 1),      # 107 tasks -> 16-20
+    ("wf-s45", "scenario_45.json", "max", 1),      # 82 tasks  (spare / 11-15)
+    ("wf-s5", "scenario_5.json", "max", 1),        # 114 tasks (spare / 16-20)
 ]
 
 
@@ -86,6 +88,8 @@ def build_one(scen_file, n_drop, oseed, levels=3):
         if not cand:
             break
         j = rng.choice(sorted(cand)); remaining.discard(j); order.append(j)
+    if n_drop == "max":
+        n_drop = len(order)
     if len(order) < n_drop:
         return None, None, f"only {len(order)} coverage-preserving drops (< {n_drop})"
     hard = list(hard) + [cp.sum(m.alloc[:, order[j]]) == 0 for j in range(n_drop)]

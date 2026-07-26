@@ -74,7 +74,9 @@ def main():
     ap.add_argument("--per-bin", type=int, default=30)
     ap.add_argument("--n-sel", type=int, default=6)
     args = ap.parse_args()
-    recs = json.loads(Path(args.pools).read_text())
+    txt = Path(args.pools).read_text()
+    recs = json.loads(txt) if txt.lstrip().startswith("[") else \
+        [json.loads(l) for l in txt.splitlines() if l.strip()]
     by_class = defaultdict(list)
     for r in recs:
         by_class[r["problem"]].append(r)

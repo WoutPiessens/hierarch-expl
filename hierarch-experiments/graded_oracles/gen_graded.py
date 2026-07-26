@@ -119,6 +119,8 @@ def main():
     classes = tuple(args.classes)
     jobs = [(p, i) for p in classes for i in hierarchy.list_instances(p)]
     pools = {}                                              # (problem, inst) -> {bin: [S,...]}
+    if args.pool_out:                                       # start fresh; append incrementally
+        Path(args.pool_out).write_text("")
     with ProcessPoolExecutor(max_workers=args.workers) as ex:
         futs = [ex.submit(pool_instance, p, i, args.maxseed, args.cap, args.pad) for p, i in jobs]
         for f in as_completed(futs):
@@ -126,13 +128,15 @@ def main():
             pools[(problem, inst)] = pool
             cov = "  ".join(f"{BLAB[b]}:{len(pool[b])}" for b in range(len(BINS)))
             print(f"  pooled {problem}/{inst}   {cov}", flush=True)
+            if args.pool_out:                               # write this instance's records NOW (JSONL)
+                with open(args.pool_out, "a", encoding="utf-8") as fh:
+                    for b in range(len(BINS)):
+                        for mc, S in pool[b]:
+                            fh.write(json.dumps({"problem": problem, "inst": inst,
+                                                 "bin": BLAB[b], "minmcs": mc, "S": S}) + "\n")
 
     if args.pool_out:
-        # dump raw pools: [{problem, inst, bin, minmcs, S}, ...] -- selection done later by the ILP
-        recs = [{"problem": p, "inst": i, "bin": BLAB[b], "minmcs": mc, "S": S}
-                for (p, i), pool in pools.items() for b in range(len(BINS)) for mc, S in pool[b]]
-        Path(args.pool_out).write_text(json.dumps(recs))
-        print(f"POOL_OUT {len(recs)} records -> {args.pool_out}\nGEN_GRADED_DONE", flush=True)
+        print(f"POOL_OUT -> {args.pool_out}\nGEN_GRADED_DONE", flush=True)
         return
 
     # ---- per-class balancing: fill each bin up to target, round-robin across instances ----
