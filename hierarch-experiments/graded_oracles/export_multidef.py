@@ -28,8 +28,10 @@ OUTDIR = {115: "output_data/20260204_125624_0", 117: "output_data/20260204_12552
 DEST = HERE.parent / "data" / "thesis-graded"
 # (name, instance id, list of unplanned defenses to require -- push high to reach the 16-20 bin)
 CONFIGS = [
-    ("unsat-115-mult11", 115, [1, 2, 3, 4, 5, 7, 9, 10, 12, 13, 16]),   # all 11 unplanned
-    ("unsat-117-mult11", 117, [0, 2, 3, 4, 5, 7, 9, 10, 11, 12, 14]),   # all 11 unplanned
+    ("unsat-115-mult9", 115, [1, 2, 3, 4, 5, 7, 9, 10, 12]),
+    ("unsat-115-mult10", 115, [1, 2, 3, 4, 5, 7, 9, 10, 12, 13]),
+    ("unsat-117-mult9", 117, [0, 2, 3, 4, 5, 7, 9, 10, 11]),
+    ("unsat-117-mult10", 117, [0, 2, 3, 4, 5, 7, 9, 10, 11, 12]),
 ]
 
 
