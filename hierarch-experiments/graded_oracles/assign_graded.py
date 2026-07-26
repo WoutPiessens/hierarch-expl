@@ -30,7 +30,9 @@ def family(inst):
     return inst.split("-")[0] if inst.startswith("nurse") else re.sub(r"-d\d+$|-m[\d-]+$", "", inst)
 
 
-def solve_class(problem, recs, per_inst, per_bin, n_sel):
+def solve_class(problem, recs, per_inst, per_bin, n_sel, maxper=None, minper=None):
+    maxper = per_inst if maxper is None else maxper
+    minper = per_inst if minper is None else minper
     # availability a[inst][bin] and the concrete pooled oracles
     avail = defaultdict(lambda: [0] * len(BLAB))
     pool = defaultdict(lambda: defaultdict(list))          # inst -> bin -> [ (minmcs,S) ]
@@ -41,14 +43,15 @@ def solve_class(problem, recs, per_inst, per_bin, n_sel):
     insts = sorted(avail)
     B = len(BLAB)
     sel = cp.boolvar(shape=len(insts), name="sel")
-    x = cp.intvar(0, per_inst, shape=(len(insts), B), name="x")
+    x = cp.intvar(0, maxper, shape=(len(insts), B), name="x")
     m = cp.Model()
     m += cp.sum(sel) == n_sel
     for ii, inst in enumerate(insts):
         for b in range(B):
             m += x[ii, b] <= avail[inst][b]
-            m += x[ii, b] <= per_inst * sel[ii]
-        m += cp.sum(x[ii, :]) == per_inst * sel[ii]
+            m += x[ii, b] <= maxper * sel[ii]
+        m += cp.sum(x[ii, :]) <= maxper * sel[ii]
+        m += cp.sum(x[ii, :]) >= minper * sel[ii]
     for b in range(B):
         m += cp.sum(x[:, b]) == per_bin
     # diversity: cap selected instances per source family
@@ -73,6 +76,8 @@ def main():
     ap.add_argument("--per-instance", type=int, default=20)
     ap.add_argument("--per-bin", type=int, default=30)
     ap.add_argument("--n-sel", type=int, default=6)
+    ap.add_argument("--maxper", type=int, default=None, help="max oracles per instance (default=per-instance)")
+    ap.add_argument("--minper", type=int, default=None, help="min oracles per selected instance")
     args = ap.parse_args()
     txt = Path(args.pools).read_text()
     recs = json.loads(txt) if txt.lstrip().startswith("[") else \
@@ -83,7 +88,7 @@ def main():
 
     for problem in args.classes:
         print(f"\n=== {problem} ===")
-        res = solve_class(problem, by_class.get(problem, []), args.per_instance, args.per_bin, args.n_sel)
+        res = solve_class(problem, by_class.get(problem, []), args.per_instance, args.per_bin, args.n_sel, args.maxper, args.minper)
         if res is None:
             print("  INFEASIBLE with the current candidate pool -- need more/other instances "
                   "(report per-bin availability below)")
